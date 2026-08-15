@@ -1,1 +1,73 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ADMIN JEFE - Eliezer Store</title>
+<style>
+body{background:#050a1a;color:#fff;font-family:Montserrat;padding:15px}h1{color:#ef4444;text-align:center;font-family:Orbitron}
+.section{background:#0f172a;padding:20px;border-radius:15px;margin-bottom:20px;border:2px solid #ef4444}
+input,select,textarea{width:100%;padding:12px;margin:8px 0;background:#1e293b;border:1px solid #334155;border-radius:8px;color:white}
+button{width:100%;padding:12px;background:#ef4444;color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;margin-top:10px}
+.btn-verde{background:#22c55e}.btn-rojo{background:#ef4444}.btn-naranja{background:#f59e0b}
+table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px}th,td{border:1px solid #1e293b;padding:8px}
+th{background:#1e293b;color:#ef4444}.badge{background:#ef4444;color:white;padding:5px 10px;border-radius:20px;font-size:12px}
+.pedido{background:#1e293b;padding:15px;margin:10px 0;border-radius:8px;border-left:4px solid #ef4444}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+</style></head>
+<body><h1>👑 PANEL JEFE - ELIEZER STORE</h1>
 
+<div class="section"><h2><span class="badge">TOTAL</span> GANANCIAS: $<span id="total-ganancias">0</span></h2></div>
+
+<div class="section"><h2>1. RECARGAR SALDO A CLIENTES</h2>
+<input id="rec-id" placeholder="ID Cliente Ej: ELZ123456">
+<input id="rec-monto" type="number" placeholder="Monto $">
+<button class="btn-naranja" onclick="recargarSaldo()">💰 RECARGAR</button>
+<p id="rec-msg" style="color:#22c55e"></p></div>
+
+<div class="section"><h2>2. GESTIONAR SOCIOS</h2>
+<input id="socio-nombre" placeholder="Nombre del Socio">
+<input id="socio-user" placeholder="Usuario del Socio">
+<input id="socio-pass" placeholder="Contraseña del Socio">
+<input id="socio-comision" type="number" placeholder="% Comisión Ej: 20">
+<button class="btn-verde" onclick="agregarSocio()">➕ AGREGAR SOCIO</button>
+<div id="lista-socios"></div></div>
+
+<div class="section"><h2>3. AGREGAR PRODUCTO</h2>
+<input id="prod-nombre" placeholder="Nombre">
+<textarea id="prod-desc" placeholder="Descripción"></textarea>
+<div class="grid-2"><input id="prod-precio-publico" type="number" placeholder="Precio Público $"><input id="prod-precio-socio" type="number" placeholder="Precio Socio $"></div>
+<select id="prod-cat"><option>Bot</option><option>Página Web</option><option>Servicio</option><option>Diseño</option><option>Marketing</option><option>Redes Sociales</option><option>Hosting y Dominio</option><option>App Móvil</option><option>Logo y Branding</option><option>Soporte Técnico</option></select>
+<button class="btn-verde" onclick="agregarProducto()">AGREGAR PRODUCTO</button></div>
+
+<div class="section"><h2>4. TODOS LOS USUARIOS</h2><table id="tabla-usuarios"><thead><tr><th>Nombre</th><th>Email</th><th>ID</th><th>Saldo</th></tr></thead><tbody></tbody></table></div>
+
+<div class="section"><h2>5. TODOS LOS PEDIDOS</h2><table id="tabla-pedidos"><thead><tr><th>Fecha</th><th>Cliente</th><th>Producto</th><th>Precio</th><th>Vendido por</th></tr></thead><tbody></tbody></table></div>
+
+<div class="section"><h2>6. PEDIDOS PERSONALIZADOS</h2><div id="lista-pedidos-texto"></div></div>
+
+<div class="section"><h2>7. PRODUCTOS</h2><div id="lista-admin-productos"></div></div>
+
+<script>
+const get=(k)=>JSON.parse(localStorage.getItem(k))||[];const set=(k,d)=>localStorage.setItem(k,JSON.stringify(d));
+window.onload=cargarTodo;
+function cargarTodo(){cargarUsuarios();cargarPedidos();cargarPedidosTexto();cargarProductosAdmin();cargarSocios();calcularGanancias()}
+
+function calcularGanancias(){let p=get('elz_pedidos').filter(x=>x.tipo==="Pago");let total=p.reduce((a,b)=>a+b.precio,0);document.getElementById('total-ganancias').innerText=total.toFixed(2)}
+
+function cargarSocios(){let s=get('elz_socios');let d=document.getElementById('lista-socios');d.innerHTML='';s.forEach(x=>d.innerHTML+=`<div style="background:#1e293b;padding:10px;margin:5px 0;border-radius:8px"><b>${x.nombre}</b> - Usuario: ${x.usuario} - Comisión: ${x.comision}% <button class="btn-rojo" style="width:auto;padding:5px 10px" onclick="borrarSocio(${x.id})">BORRAR</button></div>`)}
+
+function agregarSocio(){let n=document.getElementById('socio-nombre').value;let u=document.getElementById('socio-user').value;let p=document.getElementById('socio-pass').value;let c=document.getElementById('socio-comision').value;if(!n||!u||!p)return alert('Llena todo');let s=get('elz_socios');s.push({id:Date.now(),nombre:n,usuario:u,pass:p,comision:parseFloat(c)});set('elz_socios',s);alert('Socio agregado');cargarSocios()}
+
+function borrarSocio(id){if(!confirm('Borrar socio?'))return;let s=get('elz_socios').filter(x=>x.id!==id);set('elz_socios',s);cargarSocios()}
+
+function cargarUsuarios(){let u=get('elz_usuarios');let t=document.querySelector('#tabla-usuarios tbody');t.innerHTML='';u.forEach(x=>t.innerHTML+=`<tr><td>${x.nombre}</td><td>${x.email}</td><td style="color:#3b82f6">${x.idRecarga}</td><td style="color:#22c55e">$${x.saldo.toFixed(2)}</td></tr>`)}
+
+function cargarPedidos(){let p=get('elz_pedidos').filter(x=>x.tipo!=="Pedido Personalizado");let t=document.querySelector('#tabla-pedidos tbody');t.innerHTML='';p.reverse().forEach(x=>t.innerHTML+=`<tr><td>${x.fecha}</td><td>${x.cliente}</td><td>${x.producto}</td><td>$${x.precio}</td><td>${x.vendedor||'JEFE'}</td></tr>`)}
+
+function cargarPedidosTexto(){let p=get('elz_pedidos').filter(x=>x.tipo==="Pedido Personalizado");let d=document.getElementById('lista-pedidos-texto');d.innerHTML='';p.reverse().forEach(x=>d.innerHTML+=`<div class="pedido"><p><b>${x.cliente}</b> - ID: ${x.idRecarga}</p><p>${x.descripcion}</p></div>`)}
+
+function cargarProductosAdmin(){let p=get('elz_productos');let d=document.getElementById('lista-admin-productos');d.innerHTML='';p.forEach(x=>d.innerHTML+=`<div style="background:#1e293b;padding:10px;margin:5px 0;border-radius:8px"><span class="badge">${x.categoria}</span> <b>${x.nombre}</b><br>Público: $${x.precioPublico} | Socio: $${x.precioSocio}<br><button class="btn-rojo" style="width:auto" onclick="borrarProducto(${x.id})">BORRAR</button></div>`)}
+
+function agregarProducto(){let n=document.getElementById('prod-nombre').value;let d=document.getElementById('prod-desc').value;let pp=document.getElementById('prod-precio-publico').value;let ps=document.getElementById('prod-precio-socio').value;let c=document.getElementById('prod-cat').value;if(!n||!pp||!ps)return alert('Llena todo');let p=get('elz_productos');p.push({id:Date.now(),nombre:n,descripcion:d,precioPublico:parseFloat(pp),precioSocio:parseFloat(ps),categoria:c});set('elz_productos',p);alert('Agregado');cargarProductosAdmin()}
+
+function borrarProducto(id){if(!confirm('Borrar?'))return;let p=get('elz_productos').filter(x=>x.id!==id);set('elz_productos',p);cargarProductosAdmin()}
+
+function recargarSaldo(){let id=document.getElementById('rec-id').value;let m=parseFloat(document.getElementById('rec-monto').value);if(!id||!m)return alert('Llena');let u=get('elz_usuarios');let i=u.findIndex(x=>x.idRecarga===id);if(i===-1)return alert('ID no encontrado');u[i].saldo+=m;set('elz_usuarios',u);localStorage.setItem('update',Date.now());document.getElementById('rec-msg').innerText=`Saldo de ${u[i].nombre}: $${u[i].saldo.toFixed(2)}`;document.getElementById('rec-id').value='';document.getElementById('rec-monto').value='';cargarUsuarios()}
+</script></body></html>
