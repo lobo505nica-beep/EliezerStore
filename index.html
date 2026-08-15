@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Eliezer Store</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Eliezer Store</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Orbitron:wght@700;900&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -60,49 +58,21 @@ nav a{color:#fff;text-decoration:none;font-weight:700;font-size:18px;padding:12p
 </head>
 <body>
 
-<header>
-    <div class="logo">ELIEZER<span>STORE</span></div>
-    <div class="menu-toggle" onclick="toggleMenu()"><span></span><span></span><span></span></div>
-</header>
+<header><div class="logo">ELIEZER<span>STORE</span></div><div class="menu-toggle" onclick="toggleMenu()"><span></span><span></span><span></span></div></header>
 
-<nav id="nav">
-    <a onclick="mostrarSeccion('inicio')">INICIO</a>
-    <a onclick="mostrarSeccion('productos')">PRODUCTOS</a>
-    <a onclick="mostrarSeccion('nosotros')">NOSOTROS</a>
-    <a onclick="mostrarSeccion('contacto')">CONTACTO</a>
-    <a onclick="mostrarSeccion('login')">MI CUENTA</a>
-</nav>
+<nav id="nav"><a onclick="mostrarSeccion('inicio')">INICIO</a><a onclick="mostrarSeccion('productos')">PRODUCTOS</a><a onclick="mostrarSeccion('nosotros')">NOSOTROS</a><a onclick="mostrarSeccion('contacto')">CONTACTO</a><a onclick="mostrarSeccion('login')">MI CUENTA</a></nav>
 
-<div class="saldo-bar" id="saldoBar" style="display:none">
-    <div><p style="font-size:10px;color:#94a3b8">SALDO</p><p class="saldo-monto" id="miSaldo">$0.00</p></div>
-    <div><p style="font-size:10px;color:#94a3b8">ID</p><p class="id-recarga" id="miID">...</p></div>
-    <button class="btn-recargar" onclick="alert('Envíame tu ID por WhatsApp para recargar')">💰 RECARGAR</button>
-</div>
+<div class="saldo-bar" id="saldoBar" style="display:none"><div><p style="font-size:10px;color:#94a3b8">SALDO</p><p class="saldo-monto" id="miSaldo">$0.00</p></div><div><p style="font-size:10px;color:#94a3b8">ID</p><p class="id-recarga" id="miID">...</p></div><button class="btn-recargar" onclick="alert('Envíame tu ID por WhatsApp para recargar')">💰 RECARGAR</button></div>
 
 <section class="seccion activa" id="seccion-inicio"><div class="hero"><div><h1>ELIEZER STORE</h1><p>Tu tienda de Bots, Páginas Web y Servicios Digitales</p><button onclick="mostrarSeccion('productos')" class="btn-cta">VER CATÁLOGO</button></div></div></section>
 
-<section class="seccion" id="seccion-login"><div class="container"><h2 class="section-title">MI CUENTA</h2>
-    <div id="datos-usuario-logueado" style="display:none"><div class="datos-cuenta"><h3 style="color:#3b82f6;margin-bottom:15px">TUS DATOS</h3>
-        <div class="dato-item"><span>Nombre:</span><span class="dato-valor" id="dato-nombre"></span></div>
-        <div class="dato-item"><span>Correo:</span><span class="dato-valor" id="dato-correo"></span></div>
-        <div class="dato-item"><span>Contraseña:</span><span class="dato-valor" id="dato-pass"></span></div>
-        <div class="dato-item"><span>ID Recarga:</span><span><span class="dato-valor" id="dato-id"></span><button class="btn-copiar" onclick="copiarID()">COPIAR</button></span></div>
-        <div class="dato-item"><span>Saldo:</span><span class="dato-valor" style="color:#22c55e" id="dato-saldo"></span></div>
-    </div><button class="btn-logout" onclick="logout()">CERRAR SESIÓN</button></div>
-    <div id="form-login" class="login-container"><input type="text" id="auth-nombre" placeholder="Tu Nombre"><input type="email" id="auth-email" placeholder="Tu Correo"><input type="password" id="auth-pass" placeholder="Contraseña 6+"><button onclick="handleAuth()">ENTRAR / REGISTRARME</button><p id="auth-error" style="color:#ef4444;text-align:center;margin-top:10px"></p></div>
-</div></section>
+<section class="seccion" id="seccion-login"><div class="container"><h2 class="section-title">MI CUENTA</h2><div id="datos-usuario-logueado" style="display:none"><div class="datos-cuenta"><h3 style="color:#3b82f6;margin-bottom:15px">TUS DATOS</h3><div class="dato-item"><span>Nombre:</span><span class="dato-valor" id="dato-nombre"></span></div><div class="dato-item"><span>Correo:</span><span class="dato-valor" id="dato-correo"></span></div><div class="dato-item"><span>Contraseña:</span><span class="dato-valor" id="dato-pass"></span></div><div class="dato-item"><span>ID Recarga:</span><span><span class="dato-valor" id="dato-id"></span><button class="btn-copiar" onclick="copiarID()">COPIAR</button></span></div><div class="dato-item"><span>Saldo:</span><span class="dato-valor" style="color:#22c55e" id="dato-saldo"></span></div></div><button class="btn-logout" onclick="logout()">CERRAR SESIÓN</button></div><div id="form-login" class="login-container"><input type="text" id="auth-nombre" placeholder="Tu Nombre"><input type="email" id="auth-email" placeholder="Tu Correo"><input type="password" id="auth-pass" placeholder="Contraseña 6+"><button onclick="handleAuth()">ENTRAR / REGISTRARME</button><p id="auth-error" style="color:#ef4444;text-align:center;margin-top:10px"></p></div></div></section>
 
 <section class="seccion" id="seccion-productos"><div class="container"><h2 class="section-title">CATÁLOGO</h2><div class="productos-grid" id="lista-productos"></div></div></section>
 
-<section class="seccion" id="seccion-nosotros"><div class="container"><h2 class="section-title">SOBRE NOSOTROS</h2>
-    <div class="info-box"><h3>🚀 ¿Quiénes somos?</h3><p>Somos Eliezer Store. Creamos Bots, Páginas Web y Servicios Digitales de calidad.</p></div>
-    <div class="info-box"><h3>💯 Nuestra Misión</h3><p>Ayudarte a crecer en internet con productos rápidos y a buen precio. Soporte 24/7.</p></div>
-</div></section>
+<section class="seccion" id="seccion-nosotros"><div class="container"><h2 class="section-title">SOBRE NOSOTROS</h2><div class="info-box"><h3>🚀 ¿Quiénes somos?</h3><p>Somos Eliezer Store. Creamos Bots, Páginas Web y Servicios Digitales de calidad.</p></div><div class="info-box"><h3>💯 Nuestra Misión</h3><p>Ayudarte a crecer en internet con productos rápidos y a buen precio. Soporte 24/7.</p></div></div></section>
 
-<section class="seccion" id="seccion-contacto"><div class="container"><h2 class="section-title">CONTACTO</h2>
-    <div class="info-box"><h3>📱 WhatsApp</h3><p>+505 8331 8551</p><button class="btn-whatsapp" onclick="window.open('https://wa.me/50583318551','_blank')">ESCRIBIR AHORA</button></div>
-    <div class="info-box"><h3>📧 Correo</h3><p>eliezersstore@gmail.com</p></div>
-</div></section>
+<section class="seccion" id="seccion-contacto"><div class="container"><h2 class="section-title">CONTACTO</h2><div class="info-box"><h3>📱 WhatsApp</h3><p>+505 8331 8551</p><button class="btn-whatsapp" onclick="window.open('https://wa.me/50583318551','_blank')">ESCRIBIR AHORA</button></div><div class="info-box"><h3>📧 Correo</h3><p>eliezersstore@gmail.com</p></div></div></section>
 
 <div class="modal" id="modal"><div class="modal-content"><span class="cerrar" onclick="cerrarModal()">&times;</span><h2 id="modal-titulo"></h2><div class="pedido-box"><textarea id="texto-pedido" placeholder="Describe tu página"></textarea><button onclick="enviarPedido()">📤 ENVIAR MI PEDIDO</button></div></div></div>
 
@@ -124,8 +94,6 @@ window.onload = () => {const u = get('elz_sesion')[0]; if(u) loginUsuario(u); ca
 window.addEventListener('storage',e=>{if(e.key==='elz_usuarios'){const u=get('elz_sesion')[0];if(u){let us=get('elz_usuarios');let act=us.find(x=>x.id===u.id);localStorage.setItem('elz_sesion',JSON.stringify([act]));loginUsuario(act);cargarProductos();alert('Saldo actualizado: $'+act.saldo)}}})
 
 function loginUsuario(user){
-    let usuarios = get('elz_usuarios'); let i = usuarios.findIndex(u=>u.id===user.id);
-    usuarios[i].idRecarga = generarID(); set('elz_usuarios',usuarios); user = usuarios[i];
     usuarioActual=user; datosUsuario=user;
     document.getElementById('saldoBar').style.display='flex';
     document.getElementById('miSaldo').innerText=`$${user.saldo.toFixed(2)}`;
@@ -144,8 +112,21 @@ window.handleAuth = () => {
     const n=document.getElementById('auth-nombre').value, e=document.getElementById('auth-email').value, p=document.getElementById('auth-pass').value;
     if(!n||!e||!p){document.getElementById('auth-error').innerText="Llena todo";return}
     let usuarios=get('elz_usuarios'); let u=usuarios.find(x=>x.email===e);
-    if(u && u.pass===p){localStorage.setItem('elz_sesion',JSON.stringify([u]));loginUsuario(u)}
-    else if(!u){u={id:Date.now(),nombre:n,email:e,pass:p,saldo:0,idRecarga:generarID()};usuarios.push(u);set('elz_usuarios',usuarios);localStorage.setItem('elz_sesion',JSON.stringify([u]));loginUsuario(u)}
+
+    if(u && u.pass===p){
+        if(!u.idRecarga){
+            u.idRecarga = generarID();
+            set('elz_usuarios',usuarios);
+        }
+        localStorage.setItem('elz_sesion',JSON.stringify([u]));
+        loginUsuario(u)
+    }
+    else if(!u){
+        u={id:Date.now(),nombre:n,email:e,pass:p,saldo:0,idRecarga:generarID()};
+        usuarios.push(u);set('elz_usuarios',usuarios);
+        localStorage.setItem('elz_sesion',JSON.stringify([u]));
+        loginUsuario(u)
+    }
     else{document.getElementById('auth-error').innerText="Contraseña incorrecta"}
 }
 
@@ -162,7 +143,7 @@ function cargarProductos(){
         let precio=parseFloat(p.precioPublico) || 0;
         let puede=datosUsuario && datosUsuario.saldo>=precio;
         let btns = p.categoria==='Página Web'
-    ? `<button class="btn btn-ver" onclick="abrirPedido(${p.id},'${p.nombre}')">DESCRIBIR</button><button class="btn btn-comprar" ${!puede?'disabled':''} onclick="comprar(${p.id},'${p.nombre}',${precio})">${puede?'PAGAR $'+precio:'SIN SALDO'}</button>`
+   ? `<button class="btn btn-ver" onclick="abrirPedido(${p.id},'${p.nombre}')">DESCRIBIR</button><button class="btn btn-comprar" ${!puede?'disabled':''} onclick="comprar(${p.id},'${p.nombre}',${precio})">${puede?'PAGAR $'+precio:'SIN SALDO'}</button>`
         : `<button class="btn btn-comprar" style="width:100%" ${!puede?'disabled':''} onclick="comprar(${p.id},'${p.nombre}',${precio})">${puede?'COMPRAR $'+precio:'SIN SALDO'}</button>`;
         cont.innerHTML+=`<div class="card"><span class="badge">${p.categoria}</span><h3>${p.nombre}</h3><p>${p.descripcion}</p><p class="precio">$${precio}</p><div class="btns">${btns}</div></div>`;
     })
@@ -175,19 +156,13 @@ window.comprar=(id,n,pr)=>{
     if(datosUsuario.saldo<pr)return alert('Sin saldo');
     let u=get('elz_usuarios');let i=u.findIndex(x=>x.id===datosUsuario.id);
     u[i].saldo-=pr;
-
     let p=get('elz_pedidos');
     let prod = get('elz_productos').find(x=>x.id===id);
     let gananciaSocio = prod.precioPublico - prod.precioSocio;
-
     let socioVendedor = u.find(x=>x.idRecarga===datosUsuario.idRecarga);
-    if(socioVendedor){
-        socioVendedor.saldo += gananciaSocio;
-    }
-
+    if(socioVendedor){socioVendedor.saldo += gananciaSocio;}
     p.push({id:Date.now(),tipo:"Pago",producto:n,precio:pr,precioPublico:prod.precioPublico,precioSocio:prod.precioSocio,cliente:datosUsuario.nombre,idRecarga:datosUsuario.idRecarga,fecha:new Date().toLocaleString(),vendedor:"SOCIO", idVendedor: datosUsuario.idRecarga});
     set('elz_pedidos',p); set('elz_usuarios',u);
-
     datosCompra={producto:n,precio:pr,id:datosUsuario.idRecarga};
     loginUsuario(u[i]);cargarProductos();
     document.getElementById('compra-producto').innerText=n;
