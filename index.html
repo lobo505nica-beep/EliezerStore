@@ -69,9 +69,9 @@ nav a{color:#fff;text-decoration:none;font-weight:700;font-size:18px;padding:12p
 
 <section class="seccion" id="seccion-productos"><div class="container"><h2 class="section-title">CATÁLOGO</h2><div class="productos-grid" id="lista-productos"></div></div></section>
 
-<section class="seccion" id="seccion-nosotros"><div class="container"><h2 class="section-title">SOBRE NOSOTROS</h2><div class="info-box"><h3>🚀 ¿Quiénes somos?</h3><p>Somos Eliezer Store. Creamos Bots, Páginas Web y Servicios Digitales de calidad.</p></div><div class="info-box"><h3>💯 Nuestra Misión</h3><p>Ayudarte a crecer en internet con productos rápidos y a buen precio. Soporte 24/7.</p></div></div></section>
+<section class="seccion" id="seccion-nosotros"><div class="container"><h2 class="section-title">SOBRE NOSOTROS</h2><div class="info-box"><h3>🚀 ¿Quiénes somos?</h3><p>Somos Eliezer Store. Creamos Bots, Páginas Web y Servicios Digitales de calidad.</p></div></div></section>
 
-<section class="seccion" id="seccion-contacto"><div class="container"><h2 class="section-title">CONTACTO</h2><div class="info-box"><h3>📱 WhatsApp</h3><p>+505 8331 8551</p><button class="btn-whatsapp" onclick="window.open('https://wa.me/50583318551','_blank')">ESCRIBIR AHORA</button></div><div class="info-box"><h3>📧 Correo</h3><p>eliezersstore@gmail.com</p></div></div></section>
+<section class="seccion" id="seccion-contacto"><div class="container"><h2 class="section-title">CONTACTO</h2><div class="info-box"><h3>📱 WhatsApp</h3><p>+505 8331 8551</p><button class="btn-whatsapp" onclick="window.open('https://wa.me/50583318551','_blank')">ESCRIBIR AHORA</button></div></div></section>
 
 <div class="modal" id="modal"><div class="modal-content"><span class="cerrar" onclick="cerrarModal()">&times;</span><h2 id="modal-titulo"></h2><div class="pedido-box"><textarea id="texto-pedido" placeholder="Describe tu página"></textarea><button onclick="enviarPedido()">📤 ENVIAR MI PEDIDO</button></div></div></div>
 
@@ -90,9 +90,21 @@ function cerrarModalCompra(){document.getElementById('modal-compra').style.displ
 function copiarID(){navigator.clipboard.writeText(datosUsuario.idRecarga);alert('ID copiado')}
 
 window.onload = () => {const u = get('elz_sesion')[0]; if(u) loginUsuario(u); cargarProductos()}
-window.addEventListener('storage',e=>{if(e.key==='elz_usuarios'){const u=get('elz_sesion')[0];if(u){let us=get('elz_usuarios');let act=us.find(x=>x.id===u.id);localStorage.setItem('elz_sesion',JSON.stringify([act]));loginUsuario(act);cargarProductos();alert('Saldo actualizado: $'+act.saldo)}}})
+window.addEventListener('storage',e=>{
+    if(e.key==='elz_usuarios'){
+        const u=get('elz_sesion')[0];
+        if(u){
+            let us=get('elz_usuarios');
+            let act=us.find(x=>x.id===u.id);
+            if(act.baneado){logout();alert('🚫 Tu cuenta ha sido baneada por el administrador');return}
+            localStorage.setItem('elz_sesion',JSON.stringify([act]));
+            loginUsuario(act);cargarProductos();alert('Saldo actualizado: $'+act.saldo)
+        }
+    }
+})
 
 function loginUsuario(user){
+    if(user.baneado){logout();alert('🚫 Tu cuenta ha sido baneada por el administrador');return}
     usuarioActual=user; datosUsuario=user;
     document.getElementById('saldoBar').style.display='flex';
     document.getElementById('miSaldo').innerText=`$${user.saldo.toFixed(2)}`;
@@ -109,14 +121,15 @@ function loginUsuario(user){
 
 window.handleAuth = () => {
     const n=document.getElementById('auth-nombre').value, e=document.getElementById('auth-email').value, p=document.getElementById('auth-pass').value;
-    if(!n||!e||!p){document.getElementById('auth-error').innerText="Llena todo";return}
+    if(!n||!e||!p){document.getElementById('auth-error').innerText="Llena todos los campos";return}
     let usuarios=get('elz_usuarios'); let u=usuarios.find(x=>x.email===e);
     if(u && u.pass===p){
+        if(u.baneado){document.getElementById('auth-error').innerText="🚫 Cuenta baneada";return}
         if(!u.idRecarga){u.idRecarga = generarID();set('elz_usuarios',usuarios);}
         localStorage.setItem('elz_sesion',JSON.stringify([u]));loginUsuario(u)
     }
     else if(!u){
-        u={id:Date.now(),nombre:n,email:e,pass:p,saldo:0,idRecarga:generarID()};
+        u={id:Date.now(),nombre:n,email:e,pass:p,saldo:0,idRecarga:generarID(),baneado:false};
         usuarios.push(u);set('elz_usuarios',usuarios);
         localStorage.setItem('elz_sesion',JSON.stringify([u]));loginUsuario(u)
     }
@@ -136,16 +149,15 @@ function cargarProductos(){
         let precio=parseFloat(p.precioPublico) || 0;
         let puede=datosUsuario && datosUsuario.saldo>=precio;
         let btns = p.categoria==='Página Web'
-  ? `<button class="btn btn-ver" onclick="abrirPedido(${p.id},'${p.nombre}')">DESCRIBIR</button><button class="btn btn-comprar" ${!puede?'disabled':''} onclick="comprar(${p.id},'${p.nombre}',${precio})">${puede?'PAGAR $'+precio:'SIN SALDO'}</button>`
+? `<button class="btn btn-ver" onclick="abrirPedido(${p.id},'${p.nombre}')">DESCRIBIR</button><button class="btn btn-comprar" ${!puede?'disabled':''} onclick="comprar(${p.id},'${p.nombre}',${precio})">${puede?'PAGAR $'+precio:'SIN SALDO'}</button>`
         : `<button class="btn btn-comprar" style="width:100%" ${!puede?'disabled':''} onclick="comprar(${p.id},'${p.nombre}',${precio})">${puede?'COMPRAR $'+precio:'SIN SALDO'}</button>`;
         cont.innerHTML+=`<div class="card"><span class="badge">${p.categoria}</span><h3>${p.nombre}</h3><p>${p.descripcion}</p><p class="precio">$${precio}</p><div class="btns">${btns}</div></div>`;
     })
 }
 
 window.abrirPedido=(id,n)=>{productoActual={id,n};document.getElementById('modal').style.display='block';document.getElementById('modal-titulo').innerText=n}
-window.enviarPedido=()=>{let t=document.getElementById('texto-pedido').value;if(!t)return alert('Escribe');let p=get('elz_pedidos');p.push({id:Date.now(),tipo:"Pedido Personalizado",producto:productoActual.n,descripcion:t,cliente:datosUsuario.nombre,idRecarga:datosUsuario.idRecarga,fecha:new Date().toLocaleString(),vendedor:"JEFE"});set('elz_pedidos',p);alert('Enviado');cerrarModal()}
+window.enviarPedido=()=>{let t=document.getElementById('texto-pedido').value;if(!t)return alert('Escribe tu pedido');let p=get('elz_pedidos');p.push({id:Date.now(),tipo:"Pedido Personalizado",producto:productoActual.n,descripcion:t,cliente:datosUsuario.nombre,idRecarga:datosUsuario.idRecarga,fecha:new Date().toLocaleString(),vendedor:"JEFE"});set('elz_pedidos',p);alert('Pedido enviado!');cerrarModal()}
 
-// YA NO PAGA SOLO AL SOCIO
 window.comprar=(id,n,pr)=>{
     if(datosUsuario.saldo<pr)return alert('Sin saldo');
     let u=get('elz_usuarios');let i=u.findIndex(x=>x.id===datosUsuario.id);
