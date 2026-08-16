@@ -31,10 +31,10 @@ th{background:#1e293b;color:#ef4444}.badge{background:#ef4444;color:white;paddin
 <button class="btn-verde" onclick="desbanearCuenta()">✅ DESBANEAR CUENTA</button></div>
 
 <div class="section"><h2>4. AGREGAR PRODUCTO</h2>
-<input id="prod-nombre" placeholder="Nombre">
+<input id="prod-nombre" placeholder="Nombre del Producto">
 <textarea id="prod-desc" placeholder="Descripción"></textarea>
 <div class="grid-2"><input id="prod-precio-publico" type="number" placeholder="Precio Público $"><input id="prod-precio-socio" type="number" placeholder="Precio Socio $"></div>
-<select id="prod-cat"><option>Bot</option><option>Página Web</option><option>Servicio</option></select>
+<input id="prod-cat" placeholder="Categoría: Ej: Bot, Página Web, Servicio, IA, Diseño" value="Bot">
 <button class="btn-verde" onclick="agregarProducto()">AGREGAR PRODUCTO</button></div>
 
 <div class="section"><h2>5. TODOS LOS USUARIOS</h2><table id="tabla-usuarios"><thead><tr><th>Nombre</th><th>Email</th><th>ID</th><th>Saldo</th><th>Estado</th></tr></thead><tbody></tbody></table></div>
@@ -67,7 +67,7 @@ function cargarUsuarios(){let u=get('elz_usuarios');let t=document.querySelector
 
 function cargarPedidos(){let p=get('elz_pedidos').filter(x=>x.tipo!=="Pedido Personalizado");let t=document.querySelector('#tabla-pedidos tbody');t.innerHTML='';p.reverse().forEach(x=>t.innerHTML+=`<tr><td>${x.fecha}</td><td>${x.cliente}</td><td>${x.producto}</td><td>$${x.precio}</td><td>${x.vendedor||'JEFE'}</td></tr>`)}
 
-function agregarProducto(){let n=document.getElementById('prod-nombre').value;let d=document.getElementById('prod-desc').value;let pp=document.getElementById('prod-precio-publico').value;let ps=document.getElementById('prod-precio-socio').value;let c=document.getElementById('prod-cat').value;if(!n||!pp||!ps)return alert('Llena todo');let p=get('elz_productos');p.push({id:Date.now(),nombre:n,descripcion:d,precioPublico:parseFloat(pp),precioSocio:parseFloat(ps),categoria:c});set('elz_productos',p);alert('Producto Agregado')}
+function agregarProducto(){let n=document.getElementById('prod-nombre').value;let d=document.getElementById('prod-desc').value;let pp=document.getElementById('prod-precio-publico').value;let ps=document.getElementById('prod-precio-socio').value;let c=document.getElementById('prod-cat').value;if(!n||!pp||!ps||!c)return alert('Llena todo');let p=get('elz_productos');p.push({id:Date.now(),nombre:n,descripcion:d,precioPublico:parseFloat(pp),precioSocio:parseFloat(ps),categoria:c});set('elz_productos',p);alert('Producto Agregado');document.getElementById('prod-nombre').value='';document.getElementById('prod-desc').value='';document.getElementById('prod-precio-publico').value='';document.getElementById('prod-precio-socio').value=''}
 
 function recargarSaldo(){let id=document.getElementById('rec-id').value;let m=parseFloat(document.getElementById('rec-monto').value);if(!id||!m)return alert('Llena campos');let u=get('elz_usuarios');let i=u.findIndex(x=>x.idRecarga===id);if(i===-1)return alert('ID no encontrado');u[i].saldo+=m;set('elz_usuarios',u);localStorage.setItem('update',Date.now());document.getElementById('rec-msg').innerText=`Saldo de ${u[i].nombre}: $${u[i].saldo.toFixed(2)}`;document.getElementById('rec-id').value='';document.getElementById('rec-monto').value='';cargarUsuarios()}
 </script></body></html>
