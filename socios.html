@@ -12,14 +12,20 @@ header{background:#0f172a;padding:15px 4%;border-bottom:3px solid #f59e0b;displa
 .section{background:#0f172a;padding:20px;border-radius:15px;margin-bottom:20px;border:2px solid #f59e0b}
 .section-title{font-size:20px;font-weight:900;margin-bottom:15px;font-family:'Orbitron',sans-serif;color:#f59e0b}
 .resumen{background:#1e293b;padding:15px;border-radius:10px;text-align:center;margin-bottom:15px}
-.resumen .numero{font-size:32px;font-weight:900;color:#22c55e;font-family:Orbitron}
+.resumen.numero{font-size:32px;font-weight:900;color:#22c55e;font-family:Orbitron}
 .login-socio{background:#0f172a;padding:30px;border-radius:15px;border:2px solid #f59e0b;text-align:center;max-width:400px;margin:50px auto}
 .login-socio input{width:100%;padding:14px;margin:10px 0;background:#1e293b;border:2px solid #334155;border-radius:10px;color:white;font-size:16px}
 .login-socio button{width:100%;padding:14px;background:#f59e0b;color:#000;border:none;border-radius:10px;font-weight:900;font-size:16px;cursor:pointer;margin-top:10px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px}
 th,td{border-bottom:1px solid #1e293b;padding:10px;text-align:left}
 th{background:#1e293b;color:#f59e0b}
+.card-producto{background:#1e293b;padding:15px;border-radius:10px;margin-bottom:10px}
+.card-producto h4{color:#f59e0b}
+.badge{background:#f59e0b;color:#000;padding:4px 8px;border-radius:15px;font-size:10px;font-weight:900}
 .btn-salir{background:#ef4444;color:white;border:none;padding:8px 12px;border-radius:8px;font-weight:700;cursor:pointer}
+.btn-rojo{background:#ef4444;color:white;border:none;padding:8px 12px;border-radius:8px;font-weight:700;cursor:pointer}
+.btn-verde{background:#22c55e;color:white;border:none;padding:12px;border-radius:8px;font-weight:700;cursor:pointer;width:100%;margin-top:10px}
 </style>
 </head>
 <body>
@@ -39,7 +45,20 @@ th{background:#1e293b;color:#f59e0b}
 
     <div id="panel-socio" style="display:none">
         <div class="resumen"><p style="color:#94a3b8;font-size:12px">MIS VENTAS REALIZADAS</p><p class="numero" id="mis-ventas">0</p><p style="color:#94a3b8;font-size:12px">MI ID: <b id="mi-id-socio" style="color:#3b82f6"></b></p></div>
+
+        <div class="section">
+            <h2 class="section-title">AGREGAR MI PRODUCTO</h2>
+            <input id="prod-nombre" placeholder="Nombre del Producto">
+            <textarea id="prod-desc" placeholder="Descripción" style="width:100%;padding:12px;margin:8px 0;background:#1e293b;border:1px solid #334155;border-radius:8px;color:white"></textarea>
+            <div class="grid-2"><input id="prod-precio-publico" type="number" placeholder="Precio Público $"><input id="prod-precio-socio" type="number" placeholder="Precio Socio $"></div>
+            <input id="prod-cat" placeholder="Categoría: Ej: Bot, Servicio, Diseño" value="Servicio">
+            <button class="btn-verde" onclick="agregarProductoSocio()">➕ AGREGAR PRODUCTO</button>
+        </div>
+
+        <div class="section"><h2 class="section-title">MIS PRODUCTOS</h2><div id="lista-productos-socio"></div></div>
+
         <div class="section"><h2 class="section-title">USUARIOS REGISTRADOS</h2><table id="tabla-usuarios"><thead><tr><th>Nombre</th><th>Email</th><th>ID</th><th>Saldo</th></tr></thead><tbody></tbody></table></div>
+
         <div class="section"><h2 class="section-title">HISTORIAL DE MIS VENTAS</h2><table id="tabla-ventas"><thead><tr><th>Fecha</th><th>Cliente</th><th>Producto</th><th>Precio</th></tr></thead><tbody></tbody></table></div>
     </div>
 </div>
@@ -54,10 +73,10 @@ function solicitarRegistro(){
     let e=document.getElementById('socio-email').value;
     let p=document.getElementById('socio-pass').value;
     if(!n||!e||!p){document.getElementById('msg-socio').innerText="Llena todos los campos";return}
-    
+
     let s=get('elz_solicitudes_socios');
     if(s.find(x=>x.email===e)){document.getElementById('msg-socio').innerText="Ya tienes una solicitud pendiente";return}
-    
+
     s.push({id:Date.now(),nombre:n,email:e,pass:p});
     set('elz_solicitudes_socios',s);
     document.getElementById('msg-socio').innerText="Solicitud enviada! Espera a que el admin te acepte";
@@ -68,16 +87,16 @@ function entrarSocio(){
     let e=document.getElementById('socio-email').value;
     let p=document.getElementById('socio-pass').value;
     let u=get('elz_usuarios').find(x=>x.email===e && x.pass===p);
-    
+
     if(!u){document.getElementById('msg-socio').innerText="No estás aceptado o datos incorrectos";return}
     if(u.baneado){document.getElementById('msg-socio').innerText="🚫 Cuenta baneada";return}
-    
+
     idSocioActual = u.idRecarga;
     document.getElementById('login-socio').style.display='none';
     document.getElementById('panel-socio').style.display='block';
     document.getElementById('btnSalir').style.display='block';
     document.getElementById('mi-id-socio').innerText=u.idRecarga;
-    cargarUsuarios();cargarVentas();
+    cargarUsuarios();cargarVentas();cargarMisProductos();
 }
 
 function salir(){
@@ -96,10 +115,51 @@ function cargarVentas(){
     document.getElementById('mis-ventas').innerText=p.length;
 }
 
+function cargarMisProductos(){
+    let p = get('elz_productos').filter(x => x.idVendedor === idSocioActual);
+    let d = document.getElementById('lista-productos-socio');
+    d.innerHTML = '';
+    if(p.length === 0) d.innerHTML = '<p style="color:#94a3b8">No has agregado productos aún</p>';
+    p.forEach(x => {
+        d.innerHTML += `<div class="card-producto">
+            <span class="badge">${x.categoria}</span>
+            <h4>${x.nombre}</h4>
+            <p style="color:#94a3b8;font-size:13px">${x.descripcion}</p>
+            <p><b>Público:</b> $${x.precioPublico} | <b>Socio:</b> $${x.precioSocio}</p>
+            <button class="btn-rojo" onclick="borrarMiProducto(${x.id})">BORRAR</button>
+        </div>`
+    })
+}
+
+function agregarProductoSocio(){
+    let n=document.getElementById('prod-nombre').value;
+    let d=document.getElementById('prod-desc').value;
+    let pp=document.getElementById('prod-precio-publico').value;
+    let ps=document.getElementById('prod-precio-socio').value;
+    let c=document.getElementById('prod-cat').value;
+    if(!n||!pp||!ps||!c)return alert('Llena todo');
+
+    let p=get('elz_productos');
+    p.push({id:Date.now(),nombre:n,descripcion:d,precioPublico:parseFloat(pp),precioSocio:parseFloat(ps),categoria:c,idVendedor:idSocioActual});
+    set('elz_productos',p);
+    alert('Producto Agregado a tu catálogo!');
+    document.getElementById('prod-nombre').value='';document.getElementById('prod-desc').value='';document.getElementById('prod-precio-publico').value='';document.getElementById('prod-precio-socio').value='';
+    cargarMisProductos();
+}
+
+function borrarMiProducto(id){
+    if(!confirm('¿Seguro que quieres borrar este producto?'))return;
+    let p=get('elz_productos').filter(x=>x.id!==id);
+    set('elz_productos',p);
+    alert('Producto borrado');
+    cargarMisProductos();
+}
+
 window.addEventListener('storage', e => {
     if(idSocioActual){
         if(e.key === 'elz_pedidos') cargarVentas();
         if(e.key === 'elz_usuarios') cargarUsuarios();
+        if(e.key === 'elz_productos') cargarMisProductos();
     }
 })
 </script>
