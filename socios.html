@@ -34,12 +34,12 @@ th{background:#1e293b;color:#f59e0b}
 
 <div class="container">
     <div class="login-socio" id="login-socio">
-        <h2>ACCESO SOCIO</h2>
+        <h2>SOLICITAR ACCESO SOCIO</h2>
+        <p style="color:#94a3b8;font-size:13px;margin-bottom:15px">Pon tus datos 1 sola vez. Cuando el admin te acepte, entrarás automático.</p>
         <input id="socio-nombre" placeholder="Tu Nombre Completo">
         <input id="socio-email" type="email" placeholder="Tu Correo">
         <input id="socio-pass" type="password" placeholder="Crea una Contraseña">
         <button onclick="solicitarRegistro()">📨 SOLICITAR REGISTRO</button>
-        <button onclick="entrarSocio()" style="background:#3b82f6;color:white">ENTRAR SI YA FUI ACEPTADO</button>
         <p id="msg-socio" style="color:#22c55e;margin-top:10px"></p>
     </div>
 
@@ -68,6 +68,28 @@ const get = (k) => JSON.parse(localStorage.getItem(k)) || [];
 const set = (k,d) => localStorage.setItem(k, JSON.stringify(d));
 let idSocioActual = null;
 
+window.onload = () => {
+    revisarSiYaFueAceptado();
+}
+
+function revisarSiYaFueAceptado(){
+    let solicitud = get('elz_solicitud_mia')[0]; // Guarda mi solicitud aquí
+    if(!solicitud) return;
+
+    let u = get('elz_usuarios').find(x=>x.email===solicitud.email && x.pass===solicitud.pass);
+
+    if(u){ // YA FUI ACEPTADO
+        if(u.baneado){document.getElementById('msg-socio').innerText="🚫 Cuenta baneada";return}
+        entrarPanel(u);
+    } else {
+        // SIGO PENDIENTE
+        document.getElementById('msg-socio').innerText="⏳ Tu solicitud está pendiente. El admin aún no te ha aceptado.";
+        document.getElementById('socio-nombre').value=solicitud.nombre;
+        document.getElementById('socio-email').value=solicitud.email;
+        document.getElementById('socio-pass').value=solicitud.pass;
+    }
+}
+
 function solicitarRegistro(){
     let n=document.getElementById('socio-nombre').value;
     let e=document.getElementById('socio-email').value;
@@ -77,33 +99,40 @@ function solicitarRegistro(){
     let s=get('elz_solicitudes_socios');
     if(s.find(x=>x.email===e)){document.getElementById('msg-socio').innerText="Ya tienes una solicitud pendiente";return}
 
+    // GUARDO MI SOLICITUD PARA REVISARLA DESPUÉS
+    set('elz_solicitud_mia', [{nombre:n,email:e,pass:p}]);
+
     s.push({id:Date.now(),nombre:n,email:e,pass:p});
     set('elz_solicitudes_socios',s);
-    document.getElementById('msg-socio').innerText="Solicitud enviada! Espera a que el admin te acepte";
-    document.getElementById('socio-nombre').value='';document.getElementById('socio-email').value='';document.getElementById('socio-pass').value='';
+    document.getElementById('msg-socio').innerText="✅ Solicitud enviada! Cierra esta página y vuelve a abrirla cuando el admin te acepte.";
 }
 
-function entrarSocio(){
-    let e=document.getElementById('socio-email').value;
-    let p=document.getElementById('socio-pass').value;
-    let u=get('elz_usuarios').find(x=>x.email===e && x.pass===p);
-
-    if(!u){document.getElementById('msg-socio').innerText="No estás aceptado o datos incorrectos";return}
-    if(u.baneado){document.getElementById('msg-socio').innerText="🚫 Cuenta baneada";return}
-
+function entrarPanel(u){
     idSocioActual = u.idRecarga;
     document.getElementById('login-socio').style.display='none';
     document.getElementById('panel-socio').style.display='block';
     document.getElementById('btnSalir').style.display='block';
     document.getElementById('mi-id-socio').innerText=u.idRecarga;
-    cargarUsuarios();cargarVentas();cargarMisProductos();
+    document.getElementById('msg-socio').innerText="";
+    cargarTodo();
 }
 
 function salir(){
+    localStorage.removeItem('elz_solicitud_mia'); // Borra mi solicitud guardada
     idSocioActual=null;
     document.getElementById('panel-socio').style.display='none';
     document.getElementById('login-socio').style.display='block';
     document.getElementById('btnSalir').style.display='none';
+    document.getElementById('socio-nombre').value='';
+    document.getElementById('socio-email').value='';
+    document.getElementById('socio-pass').value='';
+    document.getElementById('msg-socio').innerText="";
+}
+
+function cargarTodo(){
+    cargarUsuarios();
+    cargarVentas();
+    cargarMisProductos();
 }
 
 function cargarUsuarios(){let u=get('elz_usuarios');let t=document.querySelector('#tabla-usuarios tbody');t.innerHTML='';u.forEach(x=>t.innerHTML+=`<tr><td>${x.nombre}</td><td>${x.email}</td><td style="color:#3b82f6">${x.idRecarga}</td><td style="color:#22c55e">$${x.saldo.toFixed(2)}</td></tr>`)}
@@ -111,7 +140,7 @@ function cargarUsuarios(){let u=get('elz_usuarios');let t=document.querySelector
 function cargarVentas(){
     let p=get('elz_pedidos').filter(x=>x.tipo==="Pago" && x.idVendedor===idSocioActual);
     let t=document.querySelector('#tabla-ventas tbody');t.innerHTML='';
-    p.reverse().forEach(x=>{t.innerHTML+=`<tr><td>${x.fecha}</td><td>${x.cliente}</td><td>${x.producto}</td><td>$${x.precioPublico}</td></tr>`})
+    p.reverse().forEach(x=>{t.innerHTML+=`<tr><td>${x.fecha}</td><td>${x.cliente}</td><td>${x.producto}</td><td>$${x.precio}</td></tr>`})
     document.getElementById('mis-ventas').innerText=p.length;
 }
 
