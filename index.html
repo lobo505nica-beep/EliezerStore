@@ -74,58 +74,22 @@ nav a{color:#fff;text-decoration:none;font-weight:700;font-size:18px;padding:12p
 <section class="seccion" id="seccion-productos"><div class="container"><h2 class="section-title">CATÁLOGO</h2><div class="productos-grid" id="lista-productos"></div></div></section>
 
 <section class="seccion" id="seccion-nosotros"><div class="container"><h2 class="section-title">SOBRE NOSOTROS</h2>
-
-    <div class="info-box"><h3>🚀 ¿Quiénes somos?</h3>
-        <p>Somos <b>Eliezer Store</b>, una empresa 100% nicaragüense dedicada a impulsar tu negocio al mundo digital. Nacimos en 2024 con la misión de hacer que la tecnología sea accesible, rápida y rentable para emprendedores, empresas y creadores de contenido.</p>
-        <p>Contamos con un equipo de desarrolladores y diseñadores apasionados por crear soluciones que realmente venden. Desde un simple bot de WhatsApp hasta una tienda online completa, nosotros lo hacemos realidad.</p>
-    </div>
-
-    <div class="info-box"><h3>💯 Nuestra Misión</h3>
-        <p>Democratizar el acceso a la tecnología. Queremos que cualquier persona, sin importar su presupuesto, pueda tener presencia profesional en internet y automatizar sus ventas 24/7.</p>
-        <ul class="lista-check">
-            <li>Productos de alta calidad a precio justo</li>
-            <li>Entrega rápida y soporte real 24/7</li>
-            <li>Soluciones personalizadas para tu negocio</li>
-        </ul>
-    </div>
-
-    <div class="info-box"><h3>🎯 Nuestra Visión</h3>
-        <p>Ser la tienda digital #1 en Centroamérica. En 2 años queremos tener +1000 clientes activos y ser reconocidos por nuestra garantía y atención al cliente. Apostamos por el talento local y por hacer crecer la economía digital de Nicaragua.</p>
-    </div>
-
-    <div class="info-box"><h3>⭐ ¿Por qué elegirnos?</h3>
-        <ul class="lista-check">
-            <li><b>Soporte 24/7:</b> Te respondemos por WhatsApp cuando lo necesites</li>
-            <li><b>Garantía Total:</b> Si algo falla, te lo arreglamos gratis</li>
-            <li><b>Precios de Socio:</b> Tenemos sistema de revendedores para que ganes dinero con nosotros</li>
-            <li><b>100% Seguro:</b> Sistema con recargas, ID fijo y anti-estafas</li>
-            <li><b>Experiencia:</b> Ya hemos ayudado a decenas de negocios a vender más</li>
-        </ul>
-    </div>
-
+    <div class="info-box"><h3>🚀 ¿Quiénes somos?</h3><p>Somos <b>Eliezer Store</b>, una empresa 100% nicaragüense dedicada a impulsar tu negocio al mundo digital. Nacimos en 2024 con la misión de hacer que la tecnología sea accesible, rápida y rentable.</p></div>
+    <div class="info-box"><h3>💯 Nuestra Misión</h3><p>Democratizar el acceso a la tecnología. Queremos que cualquier persona pueda tener presencia profesional en internet y automatizar sus ventas 24/7.</p></div>
+    <div class="info-box"><h3>⭐ ¿Por qué elegirnos?</h3><ul class="lista-check"><li><b>Soporte 24/7:</b> Te respondemos por WhatsApp</li><li><b>Garantía Total:</b> Si algo falla, te lo arreglamos gratis</li><li><b>Precios de Socio:</b> Sistema de revendedores</li><li><b>100% Seguro:</b> Sistema con recargas e ID fijo</li></ul></div>
 </div></section>
 
 <section class="seccion" id="seccion-contacto"><div class="container"><h2 class="section-title">CONTÁCTANOS</h2>
     <div class="grid-contacto">
         <div class="info-box"><h3>📱 WhatsApp Principal</h3><p>+505 8331 8551</p><p style="color:#94a3b8;font-size:13px">Respuesta inmediata de 8am a 10pm</p><button class="btn-whatsapp" onclick="window.open('https://wa.me/50583318551','_blank')">ESCRIBIR AHORA</button></div>
-
-        <div class="info-box"><h3>📧 Correo Electrónico</h3><p>eliezersstore@gmail.com</p><p style="color:#94a3b8;font-size:13px">Para facturas y soporte técnico</p></div>
-
-        <div class="info-box"><h3>📍 Ubicación</h3><p>Managua, Nicaragua</p><p style="color:#94a3b8;font-size:13px">Atendemos a todo el país 100% Online</p></div>
-
-        <div class="info-box"><h3>🕒 Horarios de Atención</h3>
-            <ul class="lista-check">
-                <li>Lunes a Viernes: 8:00am - 10:00pm</li>
-                <li>Sábados: 9:00am - 6:00pm</li>
-                <li>Domingos: Solo WhatsApp</li>
-            </ul>
-        </div>
+        <div class="info-box"><h3>📧 Correo Electrónico</h3><p>eliezersstore@gmail.com</p></div>
+        <div class="info-box"><h3>🕒 Horarios de Atención</h3><ul class="lista-check"><li>Lunes a Viernes: 8:00am - 10:00pm</li><li>Sábados: 9:00am - 6:00pm</li></ul></div>
     </div>
 </div></section>
 
 <div class="modal" id="modal"><div class="modal-content"><span class="cerrar" onclick="cerrarModal()">&times;</span><h2 id="modal-titulo"></h2><div class="pedido-box"><textarea id="texto-pedido" placeholder="Describe tu página: Colores, secciones, qué quieres que tenga..."></textarea><button onclick="enviarPedido()">📤 ENVIAR MI PEDIDO</button></div></div></div>
 
-<div class="modal" id="modal-compra"><div class="modal-compra-content"><h2 style="color:#22c55e">¡PAGO REALIZADO!</h2><p style="color:#94a3b8">Toma captura de esta pantalla y envíala por WhatsApp para activar tu producto</p><div style="background:#1e293b;padding:15px;border-radius:10px;margin:15px 0;text-align:left"><p><b>Producto:</b> <span id="compra-producto"></span></p><p><b>Precio:</b> $<span id="compra-precio"></span></p><p><b>Tu ID:</b> <span id="compra-id" style="color:#3b82f6"></span></p></div><button class="btn-whatsapp" onclick="enviarWhatsApp()">📱 ENVIAR COMPROBANTE POR WHATSAPP</button><button style="background:#475569;color:white;border:none;padding:12px;border-radius:10px;width:100%;margin-top:10px;cursor:pointer" onclick="cerrarModalCompra()">CERRAR</button></div></div>
+<div class="modal" id="modal-compra"><div class="modal-compra-content"><h2 style="color:#22c55e">¡PAGO REALIZADO!</h2><p style="color:#94a3b8">Toma captura de esta pantalla y envíala por WhatsApp</p><div style="background:#1e293b;padding:15px;border-radius:10px;margin:15px 0;text-align:left"><p><b>Producto:</b> <span id="compra-producto"></span></p><p><b>Precio:</b> $<span id="compra-precio"></span></p><p><b>Tu ID:</b> <span id="compra-id" style="color:#3b82f6"></span></p></div><button class="btn-whatsapp" onclick="enviarWhatsApp()">📱 ENVIAR COMPROBANTE POR WHATSAPP</button><button style="background:#475569;color:white;border:none;padding:12px;border-radius:10px;width:100%;margin-top:10px;cursor:pointer" onclick="cerrarModalCompra()">CERRAR</button></div></div>
 
 <script>
 let usuarioActual = null, datosUsuario = null, productoActual = null, datosCompra = null;
@@ -139,23 +103,28 @@ function cerrarModal(){document.getElementById('modal').style.display='none'}
 function cerrarModalCompra(){document.getElementById('modal-compra').style.display='none'}
 function copiarID(){navigator.clipboard.writeText(datosUsuario.idRecarga);alert('ID copiado')}
 
-window.onload = () => {const u = get('elz_sesion')[0]; if(u) loginUsuario(u); cargarProductos()}
+window.onload = () => {
+    const u = get('elz_sesion')[0];
+    if(u) loginUsuario(u);
+    cargarProductos() // Ahora carga después de login
+}
+
 window.addEventListener('storage',e=>{
     if(e.key==='elz_usuarios'){
         const u=get('elz_sesion')[0];
         if(u){
             let us=get('elz_usuarios');
             let act=us.find(x=>x.id===u.id);
-            if(act.baneado){logout();alert('🚫 Tu cuenta ha sido baneada por el administrador');return}
+            if(act.baneado){logout();alert('🚫 Tu cuenta ha sido baneada');return}
             localStorage.setItem('elz_sesion',JSON.stringify([act]));
-            loginUsuario(act);cargarProductos();alert('Saldo actualizado: $'+act.saldo)
+            loginUsuario(act);cargarProductos();alert('Saldo actualizado: $'+act.saldo.toFixed(2))
         }
     }
     if(e.key==='elz_productos') cargarProductos();
 })
 
 function loginUsuario(user){
-    if(user.baneado){logout();alert('🚫 Tu cuenta ha sido baneada por el administrador');return}
+    if(user.baneado){logout();alert('🚫 Tu cuenta ha sido baneada');return}
     usuarioActual=user; datosUsuario=user;
     document.getElementById('saldoBar').style.display='flex';
     document.getElementById('miSaldo').innerText=`$${user.saldo.toFixed(2)}`;
@@ -168,6 +137,7 @@ function loginUsuario(user){
     document.getElementById('dato-id').innerText=user.idRecarga;
     document.getElementById('dato-saldo').innerText=`$${user.saldo.toFixed(2)}`;
     mostrarSeccion('productos');
+    cargarProductos(); // Recargar productos con el saldo nuevo
 }
 
 window.handleAuth = () => {
@@ -187,7 +157,7 @@ window.handleAuth = () => {
     else{document.getElementById('auth-error').innerText="Contraseña incorrecta"}
 }
 
-window.logout = () => {localStorage.removeItem('elz_sesion');usuarioActual=null;document.getElementById('saldoBar').style.display='none';document.getElementById('form-login').style.display='block';document.getElementById('datos-usuario-logueado').style.display='none';mostrarSeccion('inicio')}
+window.logout = () => {localStorage.removeItem('elz_sesion');usuarioActual=null;datosUsuario=null;document.getElementById('saldoBar').style.display='none';document.getElementById('form-login').style.display='block';document.getElementById('datos-usuario-logueado').style.display='none';mostrarSeccion('inicio');cargarProductos()}
 
 function cargarProductos(){
     let productos=get('elz_productos');
@@ -198,20 +168,23 @@ function cargarProductos(){
     let cont=document.getElementById('lista-productos'); cont.innerHTML="";
     productos.forEach(p=>{
         let precio=parseFloat(p.precioPublico) || 0;
-        let puede=datosUsuario && datosUsuario.saldo>=precio;
+        let puede=datosUsuario && datosUsuario.saldo>=precio; // ARREGLO: ahora sí detecta el saldo
         let vendedor = p.idVendedor === 'JEFE'? 'TIENDA OFICIAL' : 'SOCIO';
+        let textoBoton =!datosUsuario? 'INICIA SESIÓN' : (puede? 'COMPRAR $'+precio : 'SIN SALDO');
+
         let btns = p.categoria==='Página Web'
-? `<button class="btn btn-ver" onclick="abrirPedido(${p.id},'${p.nombre}')">DESCRIBIR</button><button class="btn btn-comprar" ${!puede?'disabled':''} onclick="comprar(${p.id},'${p.nombre}',${precio})">${puede?'PAGAR $'+precio:'SIN SALDO'}</button>`
-        : `<button class="btn btn-comprar" style="width:100%" ${!puede?'disabled':''} onclick="comprar(${p.id},'${p.nombre}',${precio})">${puede?'COMPRAR $'+precio:'SIN SALDO'}</button>`;
+? `<button class="btn btn-ver" onclick="abrirPedido(${p.id},'${p.nombre}')">DESCRIBIR</button><button class="btn btn-comprar" ${!puede?'disabled':''} onclick="comprar(${p.id},'${p.nombre}',${precio})">${textoBoton}</button>`
+        : `<button class="btn btn-comprar" style="width:100%" ${!puede?'disabled':''} onclick="comprar(${p.id},'${p.nombre}',${precio})">${textoBoton}</button>`;
         cont.innerHTML+=`<div class="card"><span class="badge">${p.categoria}</span> <span style="font-size:10px;color:#3b82f6">${vendedor}</span><h3>${p.nombre}</h3><p>${p.descripcion}</p><p class="precio">$${precio}</p><div class="btns">${btns}</div></div>`;
     })
 }
 
-window.abrirPedido=(id,n)=>{productoActual={id,n};document.getElementById('modal').style.display='block';document.getElementById('modal-titulo').innerText=n}
+window.abrirPedido=(id,n)=>{if(!datosUsuario)return alert('Inicia sesión primero');productoActual={id,n};document.getElementById('modal').style.display='block';document.getElementById('modal-titulo').innerText=n}
 window.enviarPedido=()=>{let t=document.getElementById('texto-pedido').value;if(!t)return alert('Escribe tu pedido');let p=get('elz_pedidos');p.push({id:Date.now(),tipo:"Pedido Personalizado",producto:productoActual.n,descripcion:t,cliente:datosUsuario.nombre,idRecarga:datosUsuario.idRecarga,fecha:new Date().toLocaleString(),vendedor:"JEFE"});set('elz_pedidos',p);alert('Pedido enviado! Te contactaremos pronto');cerrarModal()}
 
 window.comprar=(id,n,pr)=>{
-    if(datosUsuario.saldo<pr)return alert('Sin saldo');
+    if(!datosUsuario)return alert('Inicia sesión primero');
+    if(datosUsuario.saldo<pr)return alert('Sin saldo. Recarga tu cuenta.');
     let u=get('elz_usuarios');let i=u.findIndex(x=>x.id===datosUsuario.id);
     u[i].saldo-=pr;
     let p=get('elz_pedidos');
@@ -219,7 +192,7 @@ window.comprar=(id,n,pr)=>{
     p.push({id:Date.now(),tipo:"Pago",producto:n,precio:pr,precioPublico:prod.precioPublico,precioSocio:prod.precioSocio,cliente:datosUsuario.nombre,idRecarga:datosUsuario.idRecarga,fecha:new Date().toLocaleString(),vendedor:"SOCIO", idVendedor: datosUsuario.idRecarga});
     set('elz_pedidos',p); set('elz_usuarios',u);
     datosCompra={producto:n,precio:pr,id:datosUsuario.idRecarga};
-    loginUsuario(u[i]);cargarProductos();
+    loginUsuario(u[i]);
     document.getElementById('compra-producto').innerText=n;
     document.getElementById('compra-precio').innerText=pr;
     document.getElementById('compra-id').innerText=datosUsuario.idRecarga;
