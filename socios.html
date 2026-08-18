@@ -2,6 +2,8 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>PANEL SOCIO - Eliezer Store</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Orbitron:wght@700;900&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -12,7 +14,7 @@ header{background:#0f172a;padding:15px 4%;border-bottom:3px solid #f59e0b;displa
 .section{background:#0f172a;padding:20px;border-radius:15px;margin-bottom:20px;border:2px solid #f59e0b}
 .section-title{font-size:20px;font-weight:900;margin-bottom:15px;font-family:'Orbitron',sans-serif;color:#f59e0b}
 .resumen{background:#1e293b;padding:15px;border-radius:10px;text-align:center;margin-bottom:15px}
-.resumen.numero{font-size:32px;font-weight:900;color:#22c55e;font-family:Orbitron}
+.resumen .numero{font-size:32px;font-weight:900;color:#22c55e;font-family:Orbitron}
 .login-socio{background:#0f172a;padding:30px;border-radius:15px;border:2px solid #f59e0b;text-align:center;max-width:400px;margin:50px auto}
 .login-socio input{width:100%;padding:14px;margin:10px 0;background:#1e293b;border:2px solid #334155;border-radius:10px;color:white;font-size:16px}
 .login-socio button{width:100%;padding:14px;background:#f59e0b;color:#000;border:none;border-radius:10px;font-weight:900;font-size:16px;cursor:pointer;margin-top:10px}
@@ -64,30 +66,45 @@ th{background:#1e293b;color:#f59e0b}
 </div>
 
 <script>
-const get = (k) => JSON.parse(localStorage.getItem(k)) || [];
-const set = (k,d) => localStorage.setItem(k, JSON.stringify(d));
-let idSocioActual = null;
+const firebaseConfig = {
+  apiKey: "AIzaSyDbJy6E0nDuOQtPgDthl2CZFHNwt2wwMds",
+  authDomain: "eliezer-store-95bc1.firebaseapp.com",
+  databaseURL: "https://eliezer-store-95bc1-default-rtdb.firebaseio.com",
+  projectId: "eliezer-store-95bc1",
+  storageBucket: "eliezer-store-95bc1.firebasestorage.app",
+  messagingSenderId: "449914306593",
+  appId: "1:449914306593:web:1388b96ce081a5e11b6360"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+let idSocioActual = localStorage.getItem('socio_id'); 
 
 window.onload = () => {
     revisarSiYaFueAceptado();
+    db.ref('usuarios').on('value', cargarUsuarios);
+    db.ref('pedidos').on('value', cargarVentas);
+    db.ref('productos').on('value', cargarMisProductos);
 }
 
 function revisarSiYaFueAceptado(){
-    let solicitud = get('elz_solicitud_mia')[0]; // Guarda mi solicitud aquí
-    if(!solicitud) return;
-
-    let u = get('elz_usuarios').find(x=>x.email===solicitud.email && x.pass===solicitud.pass);
-
-    if(u){ // YA FUI ACEPTADO
-        if(u.baneado){document.getElementById('msg-socio').innerText="🚫 Cuenta baneada";return}
-        entrarPanel(u);
-    } else {
-        // SIGO PENDIENTE
-        document.getElementById('msg-socio').innerText="⏳ Tu solicitud está pendiente. El admin aún no te ha aceptado.";
-        document.getElementById('socio-nombre').value=solicitud.nombre;
-        document.getElementById('socio-email').value=solicitud.email;
-        document.getElementById('socio-pass').value=solicitud.pass;
-    }
+    if(!idSocioActual) return;
+    db.ref('socios/'+idSocioActual).once('value').then(snap=>{
+        if(snap.exists()){ // YA FUI ACEPTADO
+            if(snap.val().baneado){document.getElementById('msg-socio').innerText="🚫 Cuenta baneada";return}
+            entrarPanel(snap.val());
+        } else {
+            // SIGO PENDIENTE
+            db.ref('solicitudes_socios/'+idSocioActual).once('value').then(s=>{
+                if(s.exists()){
+                    document.getElementById('msg-socio').innerText="⏳ Tu solicitud está pendiente. El admin aún no te ha aceptado.";
+                    document.getElementById('socio-nombre').value=s.val().nombre;
+                    document.getElementById('socio-email').value=s.val().email;
+                    document.getElementById('socio-pass').value=s.val().pass;
+                }
+            });
+        }
+    });
 }
 
 function solicitarRegistro(){
@@ -95,69 +112,65 @@ function solicitarRegistro(){
     let e=document.getElementById('socio-email').value;
     let p=document.getElementById('socio-pass').value;
     if(!n||!e||!p){document.getElementById('msg-socio').innerText="Llena todos los campos";return}
-
-    let s=get('elz_solicitudes_socios');
-    if(s.find(x=>x.email===e)){document.getElementById('msg-socio').innerText="Ya tienes una solicitud pendiente";return}
-
-    // GUARDO MI SOLICITUD PARA REVISARLA DESPUÉS
-    set('elz_solicitud_mia', [{nombre:n,email:e,pass:p}]);
-
-    s.push({id:Date.now(),nombre:n,email:e,pass:p});
-    set('elz_solicitudes_socios',s);
+    
+    let id = Date.now();
+    localStorage.setItem('socio_id', id); // Guardo mi id para entrar solo
+    db.ref('solicitudes_socios/'+id).set({nombre:n,email:e,pass:p});
     document.getElementById('msg-socio').innerText="✅ Solicitud enviada! Cierra esta página y vuelve a abrirla cuando el admin te acepte.";
 }
 
 function entrarPanel(u){
     idSocioActual = u.idRecarga;
+    localStorage.setItem('socio_id', idSocioActual);
     document.getElementById('login-socio').style.display='none';
     document.getElementById('panel-socio').style.display='block';
     document.getElementById('btnSalir').style.display='block';
     document.getElementById('mi-id-socio').innerText=u.idRecarga;
     document.getElementById('msg-socio').innerText="";
-    cargarTodo();
 }
 
 function salir(){
-    localStorage.removeItem('elz_solicitud_mia'); // Borra mi solicitud guardada
+    localStorage.removeItem('socio_id');
     idSocioActual=null;
-    document.getElementById('panel-socio').style.display='none';
-    document.getElementById('login-socio').style.display='block';
-    document.getElementById('btnSalir').style.display='none';
-    document.getElementById('socio-nombre').value='';
-    document.getElementById('socio-email').value='';
-    document.getElementById('socio-pass').value='';
-    document.getElementById('msg-socio').innerText="";
+    location.reload();
 }
 
-function cargarTodo(){
-    cargarUsuarios();
-    cargarVentas();
-    cargarMisProductos();
+function cargarUsuarios(){
+    db.ref('usuarios').once('value').then(s=>{
+        let t=document.querySelector('#tabla-usuarios tbody');t.innerHTML='';
+        s.forEach(x=>{let u=x.val(); t.innerHTML+=`<tr><td>${u.nombre}</td><td>${u.email}</td><td style="color:#3b82f6">${u.idRecarga}</td><td style="color:#22c55e">$${u.saldo.toFixed(2)}</td></tr>`})
+    });
 }
-
-function cargarUsuarios(){let u=get('elz_usuarios');let t=document.querySelector('#tabla-usuarios tbody');t.innerHTML='';u.forEach(x=>t.innerHTML+=`<tr><td>${x.nombre}</td><td>${x.email}</td><td style="color:#3b82f6">${x.idRecarga}</td><td style="color:#22c55e">$${x.saldo.toFixed(2)}</td></tr>`)}
 
 function cargarVentas(){
-    let p=get('elz_pedidos').filter(x=>x.tipo==="Pago" && x.idVendedor===idSocioActual);
-    let t=document.querySelector('#tabla-ventas tbody');t.innerHTML='';
-    p.reverse().forEach(x=>{t.innerHTML+=`<tr><td>${x.fecha}</td><td>${x.cliente}</td><td>${x.producto}</td><td>$${x.precio}</td></tr>`})
-    document.getElementById('mis-ventas').innerText=p.length;
+    db.ref('pedidos').once('value').then(s=>{
+        let ventas = [];
+        s.forEach(x=>{if(x.val().tipo==="Pago" && x.val().idVendedor===idSocioActual) ventas.push(x.val())});
+        let t=document.querySelector('#tabla-ventas tbody');t.innerHTML='';
+        ventas.reverse().forEach(x=>{t.innerHTML+=`<tr><td>${x.fecha}</td><td>${x.cliente}</td><td>${x.producto}</td><td>$${x.precio}</td></tr>`})
+        document.getElementById('mis-ventas').innerText=ventas.length;
+    });
 }
 
 function cargarMisProductos(){
-    let p = get('elz_productos').filter(x => x.idVendedor === idSocioActual);
-    let d = document.getElementById('lista-productos-socio');
-    d.innerHTML = '';
-    if(p.length === 0) d.innerHTML = '<p style="color:#94a3b8">No has agregado productos aún</p>';
-    p.forEach(x => {
-        d.innerHTML += `<div class="card-producto">
-            <span class="badge">${x.categoria}</span>
-            <h4>${x.nombre}</h4>
-            <p style="color:#94a3b8;font-size:13px">${x.descripcion}</p>
-            <p><b>Público:</b> $${x.precioPublico} | <b>Socio:</b> $${x.precioSocio}</p>
-            <button class="btn-rojo" onclick="borrarMiProducto(${x.id})">BORRAR</button>
-        </div>`
-    })
+    db.ref('productos').once('value').then(s=>{
+        let d=document.getElementById('lista-productos-socio');d.innerHTML='';
+        let hay = false;
+        s.forEach(x=>{ 
+            if(x.val().idVendedor === idSocioActual){
+                hay = true;
+                let p = x.val();
+                d.innerHTML+=`<div class="card-producto">
+                    <span class="badge">${p.categoria}</span>
+                    <h4>${p.nombre}</h4>
+                    <p style="color:#94a3b8;font-size:13px">${p.descripcion}</p>
+                    <p><b>Público:</b> $${p.precioPublico} | <b>Socio:</b> $${p.precioSocio}</p>
+                    <button class="btn-rojo" onclick="borrarMiProducto('${x.key}')">BORRAR</button>
+                </div>`
+            }
+        });
+        if(!hay) d.innerHTML = '<p style="color:#94a3b8">No has agregado productos aún</p>';
+    });
 }
 
 function agregarProductoSocio(){
@@ -168,28 +181,14 @@ function agregarProductoSocio(){
     let c=document.getElementById('prod-cat').value;
     if(!n||!pp||!ps||!c)return alert('Llena todo');
 
-    let p=get('elz_productos');
-    p.push({id:Date.now(),nombre:n,descripcion:d,precioPublico:parseFloat(pp),precioSocio:parseFloat(ps),categoria:c,idVendedor:idSocioActual});
-    set('elz_productos',p);
+    db.ref('productos').push({nombre:n,descripcion:d,precioPublico:parseFloat(pp),precioSocio:parseFloat(ps),categoria:c,idVendedor:idSocioActual});
     alert('Producto Agregado a tu catálogo!');
     document.getElementById('prod-nombre').value='';document.getElementById('prod-desc').value='';document.getElementById('prod-precio-publico').value='';document.getElementById('prod-precio-socio').value='';
-    cargarMisProductos();
 }
 
 function borrarMiProducto(id){
     if(!confirm('¿Seguro que quieres borrar este producto?'))return;
-    let p=get('elz_productos').filter(x=>x.id!==id);
-    set('elz_productos',p);
-    alert('Producto borrado');
-    cargarMisProductos();
+    db.ref('productos/'+id).remove();
 }
-
-window.addEventListener('storage', e => {
-    if(idSocioActual){
-        if(e.key === 'elz_pedidos') cargarVentas();
-        if(e.key === 'elz_usuarios') cargarUsuarios();
-        if(e.key === 'elz_productos') cargarMisProductos();
-    }
-})
 </script>
 </body></html>
