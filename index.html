@@ -1,33 +1,63 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Tienda Eliezer</title>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-  <style>
-    body{font-family:Arial;background:#111;color:#fff;padding:20px}
-    .prod{background:#222;padding:15px;margin:10px;border-radius:10px}
-    button{background:#00ff88;color:#000;border:0;padding:10px;border-radius:8px;cursor:pointer}
-    input{padding:8px;border-radius:5px;border:0;margin:5px}
-  </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Eliezer Store</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Orbitron:wght@700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box} body{font-family:'Montserrat',sans-serif;background:#050a1a;color:#fff}
+header{background:#050a1a;padding:15px 4%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:1000}
+.logo{font-family:'Orbitron',sans-serif;font-size:22px;font-weight:900;color:#3b82f6}.logo span{color:#f59e0b}
+.menu-toggle{display:flex;flex-direction:column;gap:5px;cursor:pointer}.menu-toggle span{width:28px;height:3px;background:#3b82f6;border-radius:2px}
+nav{position:fixed;top:60px;right:-100%;width:80%;height:100vh;background:#0f172a;flex-direction:column;padding:30px 20px;gap:25px;transition:0.3s;display:flex;border-left:2px solid #3b82f6;overflow-y:auto}
+nav.activo{right:0} nav a{color:#fff;text-decoration:none;font-weight:700;font-size:18px;padding:12px 0;border-bottom:1px solid #1e293b;cursor:pointer}
+.saldo-bar{background:#0f172a;padding:12px 4%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1e293b}
+.saldo-monto{font-size:20px;font-weight:900;color:#22c55e;font-family:Orbitron}.id-recarga{background:#1e293b;padding:5px 10px;border-radius:8px;font-size:12px;color:#3b82f6;font-family:Orbitron}
+.btn-recargar{background:#f59e0b;color:#000;border:none;padding:8px 12px;border-radius:10px;font-weight:800;cursor:pointer;font-size:12px}
+.seccion{display:none}.seccion.activa{display:block}.hero{min-height:70vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:30px 4%}
+.hero h1{font-family:'Orbitron',sans-serif;font-size:36px;font-weight:900;background:linear-gradient(90deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.btn-cta{width:100%;padding:16px;background:linear-gradient(90deg,#3b82f6,#8b5cf6);color:white;border:none;border-radius:15px;font-weight:800;font-size:16px;cursor:pointer;margin-top:10px}
+.container{padding:30px 4%}.section-title{text-align:center;font-size:26px;font-weight:900;margin-bottom:20px;font-family:'Orbitron',sans-serif}
+.productos-grid{display:grid;grid-template-columns:1fr;gap:20px}.card{background:#0f172a;border-radius:20px;padding:20px;border:1px solid #1e293b}
+.badge{background:#f59e0b;color:#000;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:900;display:inline-block}
+.card h3{font-size:20px;color:#3b82f6;margin:10px 0}.card p{color:#94a3b8;font-size:14px}.precio{font-size:26px;color:#22c55e;font-weight:900;margin:10px 0}
+.btns{display:flex;gap:10px}.btn{flex:1;padding:14px;border-radius:12px;font-weight:800;text-align:center;cursor:pointer;border:none;font-size:14px}
+.btn-ver{background:transparent;border:2px solid #3b82f6;color:#3b82f6}.btn-comprar{background:#25D366;color:white}.btn-comprar:disabled{background:#475569;color:#94a3b8;cursor:not-allowed}
+.datos-cuenta{background:#0f172a;padding:20px;border-radius:15px;border:2px solid #3b82f6;margin-bottom:20px}
+.dato-item{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #1e293b}.dato-valor{color:#fff;font-weight:700;font-family:Orbitron}
+.btn-copiar{background:#3b82f6;color:white;border:none;padding:5px 10px;border-radius:5px;font-size:12px;cursor:pointer}
+.pedido-box{background:#0f172a;padding:20px;border-radius:15px;border:2px solid #3b82f6;margin-top:15px}
+.pedido-box textarea{width:100%;height:120px;padding:12px;background:#1e293b;border:2px solid #334155;border-radius:10px;color:white;font-size:15px;font-family:Montserrat}
+.pedido-box button{width:100%;padding:14px;margin-top:10px;background:#25D366;color:white;border:none;border-radius:12px;font-weight:800;font-size:16px;cursor:pointer}
+.login-container{background:#0f172a;padding:30px;border-radius:20px;border:2px solid #3b82f6}
+.login-container input{width:100%;padding:16px;margin:10px 0;background:#1e293b;border:2px solid #334155;border-radius:12px;color:white;font-size:16px}
+.login-container button{width:100%;padding:16px;margin-top:10px;background:linear-gradient(90deg,#3b82f6,#8b5cf6);color:white;border:none;border-radius:12px;font-weight:800;font-size:16px;cursor:pointer}
+.modal{display:none;position:fixed;z-index:9999;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);overflow-y:auto}
+.modal-content{background:#0f172a;padding:20px;min-height:100vh}.modal-compra-content{background:#0f172a;padding:30px;border-radius:20px;border:3px solid #22c55e;text-align:center;max-width:400px;margin:50px auto}
+.cerrar{float:right;font-size:30px;cursor:pointer;color:#ef4444}.btn-whatsapp{background:#25D366;color:white;border:none;padding:14px;border-radius:12px;font-weight:800;font-size:16px;cursor:pointer;width:100%;margin-top:10px}
+.btn-logout{background:#ef4444;color:white;border:none;padding:12px;border-radius:10px;font-weight:700;cursor:pointer;width:100%}
+</style>
 </head>
 <body>
-<h1>🔥 Tienda Eliezer</h1>
+<header><div class="logo">ELIEZER<span>STORE</span></div><div class="menu-toggle" onclick="toggleMenu()"><span></span><span></span><span></span></div></header>
+<nav id="nav"><a onclick="mostrarSeccion('inicio')">INICIO</a><a onclick="mostrarSeccion('productos')">PRODUCTOS</a><a onclick="mostrarSeccion('nosotros')">NOSOTROS</a><a onclick="mostrarSeccion('contacto')">CONTACTO</a><a onclick="mostrarSeccion('login')">MI CUENTA</a></nav>
 
-<div id="auth">
-  <input id="email" placeholder="Correo">
-  <input id="pass" type="password" placeholder="Contraseña">
-  <button onclick="login()">Entrar</button>
-  <button onclick="register()">Registrarse</button>
-</div>
+<div class="saldo-bar" id="saldoBar" style="display:none"><div><p style="font-size:10px;color:#94a3b8">SALDO</p><p class="saldo-monto" id="miSaldo">$0.00</p></div><div><p style="font-size:10px;color:#94a3b8">ID</p><p class="id-recarga" id="miID">...</p></div><button class="btn-recargar" onclick="alert('Envíame tu ID por WhatsApp para recargar')">💰 RECARGAR</button></div>
 
-<div id="tienda" style="display:none">
-  <h3>Saldo: $<span id="saldo">0</span></h3>
-  <button onclick="logout()">Salir</button>
-  <div id="productos"></div>
-</div>
+<section class="seccion activa" id="seccion-inicio"><div class="hero"><div><h1>ELIEZER STORE</h1><p>Tu tienda de Bots, Páginas Web y Servicios Digitales #1 en Nicaragua</p><button onclick="mostrarSeccion('productos')" class="btn-cta">VER CATÁLOGO</button></div></div></section>
+
+<section class="seccion" id="seccion-login"><div class="container"><h2 class="section-title">MI CUENTA</h2><div id="datos-usuario-logueado" style="display:none"><div class="datos-cuenta"><h3 style="color:#3b82f6;margin-bottom:15px">TUS DATOS</h3><div class="dato-item"><span>Nombre:</span><span class="dato-valor" id="dato-nombre"></span></div><div class="dato-item"><span>Correo:</span><span class="dato-valor" id="dato-correo"></span></div><div class="dato-item"><span>ID Recarga:</span><span><span class="dato-valor" id="dato-id"></span><button class="btn-copiar" onclick="copiarID()">COPIAR</button></span></div><div class="dato-item"><span>Saldo:</span><span class="dato-valor" style="color:#22c55e" id="dato-saldo"></span></div></div><button class="btn-logout" onclick="logout()">CERRAR SESIÓN</button></div><div id="form-login" class="login-container"><input type="text" id="auth-nombre" placeholder="Tu Nombre"><input type="email" id="auth-email" placeholder="Tu Correo"><input type="password" id="auth-pass" placeholder="Contraseña 6+"><button onclick="handleAuth()">ENTRAR / REGISTRARME</button><p id="auth-error" style="color:#ef4444;text-align:center;margin-top:10px"></p></div></div></section>
+
+<section class="seccion" id="seccion-productos"><div class="container"><h2 class="section-title">CATÁLOGO</h2><div class="productos-grid" id="lista-productos"></div></div></section>
+
+<section class="seccion" id="seccion-nosotros"><div class="container"><h2 class="section-title">SOBRE NOSOTROS</h2><div class="info-box"><h3>🚀 ¿Quiénes somos?</h3><p>Somos <b>Eliezer Store</b>, empresa 100% nicaragüense</p></div></div></section>
+
+<section class="seccion" id="seccion-contacto"><div class="container"><h2 class="section-title">CONTÁCTANOS</h2><button class="btn-whatsapp" onclick="window.open('https://wa.me/50583318551','_blank')">ESCRIBIR POR WHATSAPP</button></div></section>
+
+<div class="modal" id="modal"><div class="modal-content"><span class="cerrar" onclick="cerrarModal()">&times;</span><h2 id="modal-titulo"></h2><div class="pedido-box"><textarea id="texto-pedido" placeholder="Describe tu página: Colores, secciones..."></textarea><button onclick="enviarPedido()">📤 ENVIAR MI PEDIDO</button></div></div></div>
+
+<div class="modal" id="modal-compra"><div class="modal-compra-content"><h2 style="color:#22c55e">¡PAGO REALIZADO!</h2><p style="color:#94a3b8">Toma captura y envíala por WhatsApp</p><div style="background:#1e293b;padding:15px;border-radius:10px;margin:15px 0;text-align:left"><p><b>Producto:</b> <span id="compra-producto"></span></p><p><b>Precio:</b> $<span id="compra-precio"></span></p><p><b>Tu ID:</b> <span id="compra-id" style="color:#3b82f6"></span></p></div><button class="btn-whatsapp" onclick="enviarWhatsApp()">📱 ENVIAR COMPROBANTE</button><button style="background:#475569;color:white;border:none;padding:12px;border-radius:10px;width:100%;margin-top:10px;cursor:pointer" onclick="cerrarModalCompra()">CERRAR</button></div></div>
 
 <script>
 const firebaseConfig = {
@@ -41,58 +71,101 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-const auth = firebase.auth();
 
-let userId = null;
+let usuarioActual = null, datosUsuario = null, productoActual = null, datosCompra = null;
+const generarID = () => 'ELZ' + Math.floor(100000 + Math.random() * 900000);
 
-auth.onAuthStateChanged(user => {
-  if(user){
-    userId = user.uid;
-    document.getElementById('auth').style.display='none';
-    document.getElementById('tienda').style.display='block';
-    cargarSaldo();
+function mostrarSeccion(id){document.querySelectorAll('.seccion').forEach(s=>s.classList.remove('activa'));document.getElementById('seccion-'+id).classList.add('activa');document.getElementById('nav').classList.remove('activo')}
+function toggleMenu(){document.getElementById('nav').classList.toggle('activo')}
+function cerrarModal(){document.getElementById('modal').style.display='none'}
+function cerrarModalCompra(){document.getElementById('modal-compra').style.display='none'}
+function copiarID(){navigator.clipboard.writeText(datosUsuario.idRecarga);alert('ID copiado')}
+
+window.onload = () => {
+    const u = JSON.parse(localStorage.getItem('elz_sesion'))[0];
+    if(u) cargarUsuario(u.id);
+    cargarProductos()
+}
+
+function cargarUsuario(id){
+    db.ref('usuarios/'+id).on('value', snap=>{
+        if(!snap.exists()) return logout();
+        let user = snap.val();
+        if(user.baneado){logout();alert('🚫 Tu cuenta ha sido baneada');return}
+        loginUsuario({id:id,...user});
+    });
+}
+
+function loginUsuario(user){
+    usuarioActual=user; datosUsuario=user;
+    document.getElementById('saldoBar').style.display='flex';
+    document.getElementById('miSaldo').innerText=`$${user.saldo.toFixed(2)}`;
+    document.getElementById('miID').innerText=user.idRecarga;
+    document.getElementById('form-login').style.display='none';
+    document.getElementById('datos-usuario-logueado').style.display='block';
+    document.getElementById('dato-nombre').innerText=user.nombre;
+    document.getElementById('dato-correo').innerText=user.email;
+    document.getElementById('dato-id').innerText=user.idRecarga;
+    document.getElementById('dato-saldo').innerText=`$${user.saldo.toFixed(2)}`;
+    mostrarSeccion('productos');
     cargarProductos();
-  }
-});
-
-function register(){
-  auth.createUserWithEmailAndPassword(email.value, pass.value)
-  .then(u => db.ref('usuarios/'+u.user.uid).set({saldo:0, email:email.value}));
 }
-function login(){ auth.signInWithEmailAndPassword(email.value, pass.value); }
-function logout(){ auth.signOut(); location.reload(); }
 
-function cargarSaldo(){
-  db.ref('usuarios/'+userId+'/saldo').on('value', snap => {
-    document.getElementById('saldo').innerText = snap.val() || 0;
-  });
+window.handleAuth = () => {
+    const n=document.getElementById('auth-nombre').value, e=document.getElementById('auth-email').value, p=document.getElementById('auth-pass').value;
+    if(!n||!e||!p){document.getElementById('auth-error').innerText="Llena todos los campos";return}
+    db.ref('usuarios').once('value').then(snap=>{
+        let usuarios = snap.val() || {};
+        let id = Object.keys(usuarios).find(k=>usuarios[k].email===e);
+        if(id && usuarios[id].pass===p){
+            if(usuarios[id].baneado){document.getElementById('auth-error').innerText="🚫 Cuenta baneada";return}
+            localStorage.setItem('elz_sesion',JSON.stringify([{id:id}]));cargarUsuario(id)
+        }
+        else if(!id){
+            let nuevoID = generarID();
+            let nuevo = {nombre:n,email:e,pass:p,saldo:0,idRecarga:nuevoID,baneado:false};
+            let key = db.ref('usuarios').push().key;
+            db.ref('usuarios/'+key).set(nuevo);
+            localStorage.setItem('elz_sesion',JSON.stringify([{id:key}]));cargarUsuario(key)
+        }
+        else{document.getElementById('auth-error').innerText="Contraseña incorrecta"}
+    });
 }
+
+window.logout = () => {localStorage.removeItem('elz_sesion');usuarioActual=null;datosUsuario=null;document.getElementById('saldoBar').style.display='none';document.getElementById('form-login').style.display='block';document.getElementById('datos-usuario-logueado').style.display='none';mostrarSeccion('inicio');cargarProductos()}
 
 function cargarProductos(){
-  db.ref('productos').on('value', snap => {
-    let html='';
-    snap.forEach(p => {
-      let prod = p.val();
-      html += `<div class="prod">
-        <h3>${prod.nombre}</h3>
-        <p>${prod.descripcion}</p>
-        <p>Precio: $${prod.precioPublico}</p>
-        <button onclick="comprar('${p.key}',${prod.precioPublico})">Comprar</button>
-      </div>`;
+    db.ref('productos').on('value', snap=>{
+        let productos = snap.val() || {};
+        let cont=document.getElementById('lista-productos'); cont.innerHTML="";
+        Object.keys(productos).forEach(key=>{
+            let p = productos[key];
+            let precio=parseFloat(p.precioPublico) || 0;
+            let puede=datosUsuario && datosUsuario.saldo>=precio;
+            let vendedor = p.idVendedor === 'JEFE'? 'TIENDA OFICIAL' : 'SOCIO';
+            let textoBoton =!datosUsuario? 'INICIA SESIÓN' : (puede? 'COMPRAR $'+precio : 'SIN SALDO');
+            let btns = p.categoria==='Página Web'
+? `<button class="btn btn-ver" onclick="abrirPedido('${key}','${p.nombre}')">DESCRIBIR</button><button class="btn btn-comprar" ${!puede?'disabled':''} onclick="comprar('${key}','${p.nombre}',${precio})">${textoBoton}</button>`
+            : `<button class="btn btn-comprar" style="width:100%" ${!puede?'disabled':''} onclick="comprar('${key}','${p.nombre}',${precio})">${textoBoton}</button>`;
+            cont.innerHTML+=`<div class="card"><span class="badge">${p.categoria}</span> <span style="font-size:10px;color:#3b82f6">${vendedor}</span><h3>${p.nombre}</h3><p>${p.descripcion}</p><p class="precio">$${precio}</p><div class="btns">${btns}</div></div>`;
+        });
     });
-    document.getElementById('productos').innerHTML=html;
-  });
 }
 
-function comprar(id,precio){
-  db.ref('usuarios/'+userId+'/saldo').once('value').then(snap=>{
-    let saldo = snap.val() || 0;
-    if(saldo >= precio){
-      db.ref('usuarios/'+userId+'/saldo').set(saldo - precio);
-      alert('Compra realizada!');
-    }else alert('Saldo insuficiente');
-  });
+window.abrirPedido=(id,n)=>{if(!datosUsuario)return alert('Inicia sesión primero');productoActual={id,n};document.getElementById('modal').style.display='block';document.getElementById('modal-titulo').innerText=n}
+window.enviarPedido=()=>{let t=document.getElementById('texto-pedido').value;if(!t)return alert('Escribe tu pedido');db.ref('pedidos').push({tipo:"Pedido Personalizado",producto:productoActual.n,descripcion:t,cliente:datosUsuario.nombre,idRecarga:datosUsuario.idRecarga,fecha:new Date().toLocaleString(),vendedor:"JEFE"});alert('Pedido enviado!');cerrarModal()}
+
+window.comprar=(id,n,pr)=>{
+    if(!datosUsuario)return alert('Inicia sesión primero');
+    if(datosUsuario.saldo<pr)return alert('Sin saldo. Recarga tu cuenta.');
+    db.ref('usuarios/'+usuarioActual.id+'/saldo').set(datosUsuario.saldo - pr);
+    db.ref('pedidos').push({tipo:"Pago",producto:n,precio:pr,cliente:datosUsuario.nombre,idRecarga:datosUsuario.idRecarga,fecha:new Date().toLocaleString(),vendedor:"SOCIO", idVendedor: datosUsuario.idRecarga});
+    datosCompra={producto:n,precio:pr,id:datosUsuario.idRecarga};
+    document.getElementById('compra-producto').innerText=n;
+    document.getElementById('compra-precio').innerText=pr;
+    document.getElementById('compra-id').innerText=datosUsuario.idRecarga;
+    document.getElementById('modal-compra').style.display='block';
 }
+window.enviarWhatsApp=()=>{window.open(`https://wa.me/50583318551?text=Hola, acabo de pagar ${datosCompra.producto} por $${datosCompra.precio}. Mi ID es: ${datosCompra.id}`,'_blank');cerrarModalCompra()}
 </script>
-</body>
-</html>
+</body></html>
