@@ -80,7 +80,7 @@ th{background:#1e293b;color:#ef4444;font-weight:800}
 </div>
 
 <div class="section">
-    <h2>7. TODOS LOS USUARIOS</h2>
+    <h2>7. TODOS LOS USUARIOS / CLIENTES</h2>
     <table id="tabla-usuarios">
         <thead>
             <tr><th>Nombre</th><th>Email</th><th>ID</th><th>Saldo</th><th>Estado</th></tr>
@@ -104,6 +104,16 @@ th{background:#1e293b;color:#ef4444;font-weight:800}
     <div id="lista-pedidos-personalizados"><p style="color:#94a3b8">Cargando...</p></div>
 </div>
 
+<div class="section">
+    <h2>10. TODOS LOS SOCIOS APROBADOS</h2>
+    <table id="tabla-socios">
+        <thead>
+            <tr><th>Nombre</th><th>Email</th><th>ID Socio</th><th>Estado</th></tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyDbJy6E0nDuOQtPgDthl2CZFHNwt2wwMds",
@@ -121,6 +131,7 @@ const generarID = () => 'ELZ' + Math.floor(100000 + Math.random() * 900000);
 window.onload = cargarTodo;
 function cargarTodo(){
     cargarUsuarios();
+    cargarSocios();
     cargarPedidos();
     cargarPedidosPersonalizados();
     cargarSolicitudes();
@@ -131,6 +142,7 @@ function cargarTodo(){
 // TIEMPO REAL - Se actualiza solo
 db.ref('pedidos').on('value',()=>{cargarPedidos();cargarPedidosPersonalizados();calcularGanancias()});
 db.ref('usuarios').on('value',cargarUsuarios);
+db.ref('socios').on('value',cargarSocios);
 db.ref('productos').on('value',cargarTodosProductos);
 db.ref('solicitudes_socios').on('value',cargarSolicitudes);
 
@@ -171,7 +183,8 @@ function aceptarSocio(id){
             email:sol.email,
             pass:sol.pass,
             idRecarga:nuevoID,
-            baneado:false
+            baneado:false,
+            saldo:0
         });
         db.ref('solicitudes_socios/'+id).remove();
         alert('✅ Socio ACEPTADO!\n\nDale este ID al socio: '+nuevoID)
@@ -269,6 +282,23 @@ function cargarUsuarios(){
     })
 }
 
+function cargarSocios(){
+    db.ref('socios').on('value',s=>{
+        let t=document.querySelector('#tabla-socios tbody');
+        t.innerHTML='';
+        if(!s.exists()){t.innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8">No hay socios aprobados</td></tr>';return}
+        s.forEach(x=>{
+            let u=x.val();
+            t.innerHTML+=`<tr>
+                <td>${u.nombre}</td>
+                <td>${u.email}</td>
+                <td style="color:#f59e0b">${u.idRecarga}</td>
+                <td>${u.baneado?'<span style="color:#ef4444">BANEADO</span>':'<span style="color:#22c55e">ACTIVO</span>'}</td>
+            </tr>`
+        })
+    })
+}
+
 function cargarPedidos(){
     db.ref('pedidos').on('value',s=>{
         let t=document.querySelector('#tabla-pedidos tbody');
@@ -339,19 +369,35 @@ function recargarSaldo(){
     let m=parseFloat(document.getElementById('rec-monto').value);
     if(!id||!m) return alert('Llena ID y Monto');
     
+    // Busca en USUARIOS
     db.ref('usuarios').once('value').then(s=>{
         let encontrado = false;
         s.forEach(u=>{
             if(u.val().idRecarga===id){
                 let saldoNuevo = u.val().saldo + m;
                 db.ref('usuarios/'+u.key+'/saldo').set(saldoNuevo);
-                document.getElementById('rec-msg').innerText=`✅ Recargados $${m} a ${u.val().nombre}`;
+                document.getElementById('rec-msg').innerText=`✅ Recargados $${m} a CLIENTE: ${u.val().nombre}`;
                 document.getElementById('rec-id').value='';
                 document.getElementById('rec-monto').value='';
                 encontrado = true;
             }
         });
-        if(!encontrado) document.getElementById('rec-msg').innerText='❌ ID no encontrado'
+        // Si no está en usuarios, busca en SOCIOS
+        if(!encontrado){
+            db.ref('socios').once('value').then(s2=>{
+                s2.forEach(u=>{
+                    if(u.val().idRecarga===id){
+                        let saldoNuevo = u.val().saldo ? u.val().saldo + m : m;
+                        db.ref('socios/'+u.key+'/saldo').set(saldoNuevo);
+                        document.getElementById('rec-msg').innerText=`✅ Recargados $${m} a SOCIO: ${u.val().nombre}`;
+                        document.getElementById('rec-id').value='';
+                        document.getElementById('rec-monto').value='';
+                        encontrado = true;
+                    }
+                });
+                if(!encontrado) document.getElementById('rec-msg').innerText='❌ ID no encontrado'
+            })
+        }
     })
 }
 </script>
