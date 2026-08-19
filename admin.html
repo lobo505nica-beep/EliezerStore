@@ -1,33 +1,111 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ADMIN JEFE</title>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADMIN JEFE - ELIEZER STORE</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-<style>body{background:#050a1a;color:#fff;font-family:Montserrat;padding:15px}h1{color:#ef4444;text-align:center;font-family:Orbitron}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Orbitron:wght@700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box} 
+body{background:#050a1a;color:#fff;font-family:'Montserrat',sans-serif;padding:15px}
+h1{color:#ef4444;text-align:center;font-family:'Orbitron',sans-serif;font-size:28px;margin-bottom:20px}
 .section{background:#0f172a;padding:20px;border-radius:15px;margin-bottom:20px;border:2px solid #ef4444}
-input,textarea{width:100%;padding:12px;margin:8px 0;background:#1e293b;border:1px solid #334155;border-radius:8px;color:white}
-button{width:100%;padding:12px;background:#ef4444;color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;margin-top:10px}
+.section h2{color:#3b82f6;margin-bottom:15px;font-size:18px}
+input,textarea{width:100%;padding:12px;margin:8px 0;background:#1e293b;border:1px solid #334155;border-radius:8px;color:white;font-size:15px;font-family:Montserrat}
+button{width:100%;padding:14px;background:#ef4444;color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;margin-top:10px;font-size:15px}
 .btn-verde{background:#22c55e}.btn-rojo{background:#ef4444}.btn-naranja{background:#f59e0b}.btn-azul{background:#3b82f6}
-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px}th,td{border:1px solid #1e293b;padding:8px}
-th{background:#1e293b;color:#ef4444}.badge{background:#ef4444;color:white;padding:5px 10px;border-radius:20px;font-size:12px}
+table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px}
+th,td{border:1px solid #1e293b;padding:8px;text-align:left}
+th{background:#1e293b;color:#ef4444;font-weight:800}
+.badge{background:#ef4444;color:white;padding:5px 10px;border-radius:20px;font-size:12px;font-weight:900}
 .solicitud{background:#1e293b;padding:15px;margin:10px 0;border-radius:8px;border-left:4px solid #f59e0b}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.card-producto{background:#1e293b;padding:15px;border-radius:10px;margin-bottom:10px}
+.card-producto{background:#1e293b;padding:15px;border-radius:10px;margin-bottom:10px;border:1px solid #334155}
+.card-producto h4{color:#3b82f6;margin-bottom:8px}
 .pedido-personalizado{background:#1e293b;padding:15px;border-radius:10px;margin-bottom:10px;border-left:4px solid #3b82f6}
-</style></head>
-<body><h1>👑 PANEL JEFE</h1>
-<div class="section"><h2><span class="badge">TOTAL</span> GANANCIAS: $<span id="total-ganancias">0</span></h2></div>
-<div class="section"><h2>1. SOLICITUDES DE SOCIOS</h2><div id="lista-solicitudes"></div></div>
-<div class="section"><h2>2. RECARGAR SALDO</h2><input id="rec-id" placeholder="ID Cliente/Socio"><input id="rec-monto" type="number" placeholder="Monto $"><button class="btn-naranja" onclick="recargarSaldo()">💰 RECARGAR</button><p id="rec-msg" style="color:#22c55e"></p></div>
-<div class="section"><h2>3. BANEAR / DESBANEAR</h2><input id="ban-id" placeholder="Pega el ID"><button class="btn-rojo" onclick="banearCuenta()">🚫 BANEAR</button><button class="btn-verde" onclick="desbanearCuenta()">✅ DESBANEAR</button></div>
-<div class="section"><h2>4. ELIMINAR CUENTA</h2><input id="eliminar-id" placeholder="Pega el ID"><button class="btn-rojo" onclick="eliminarCuenta()">🗑️ ELIMINAR</button></div>
-<div class="section"><h2>5. AGREGAR PRODUCTO</h2><input id="prod-nombre" placeholder="Nombre"><textarea id="prod-desc" placeholder="Descripción"></textarea><div class="grid-2"><input id="prod-precio-publico" type="number" placeholder="Precio Público $"><input id="prod-precio-socio" type="number" placeholder="Precio Socio $"></div><input id="prod-cat" value="Bot"><button class="btn-verde" onclick="agregarProducto()">AGREGAR</button></div>
-<div class="section"><h2>6. TODOS LOS PRODUCTOS</h2><div id="lista-todos-productos"></div></div>
-<div class="section"><h2>7. TODOS LOS USUARIOS</h2><table id="tabla-usuarios"><thead><tr><th>Nombre</th><th>Email</th><th>ID</th><th>Saldo</th><th>Estado</th></tr></thead><tbody></tbody></table></div>
-<div class="section"><h2>8. PEDIDOS DE PAGO</h2><table id="tabla-pedidos"><thead><tr><th>Fecha</th><th>Cliente</th><th>Producto</th><th>Precio</th><th>Vendido por</th></tr></thead><tbody></tbody></table></div>
-<div class="section"><h2>9. PEDIDOS PERSONALIZADOS</h2><div id="lista-pedidos-personalizados"></div></div>
+.pedido-personalizado p{margin:5px 0;color:#cbd5e1}
+</style>
+</head>
+<body>
+
+<h1>👑 PANEL JEFE - ELIEZER STORE</h1>
+
+<div class="section">
+    <h2><span class="badge">TOTAL</span> GANANCIAS: $<span id="total-ganancias">0</span></h2>
+</div>
+
+<div class="section">
+    <h2>1. SOLICITUDES DE SOCIOS PENDIENTES</h2>
+    <div id="lista-solicitudes"><p style="color:#94a3b8">Cargando...</p></div>
+</div>
+
+<div class="section">
+    <h2>2. RECARGAR SALDO</h2>
+    <input id="rec-id" placeholder="ID Cliente/Socio - Ej: ELZ123456">
+    <input id="rec-monto" type="number" placeholder="Monto $">
+    <button class="btn-naranja" onclick="recargarSaldo()">💰 RECARGAR SALDO</button>
+    <p id="rec-msg" style="color:#22c55e;text-align:center;margin-top:10px"></p>
+</div>
+
+<div class="section">
+    <h2>3. BANEAR / DESBANEAR CUENTA</h2>
+    <input id="ban-id" placeholder="Pega el ID del usuario">
+    <button class="btn-rojo" onclick="banearCuenta()">🚫 BANEAR</button>
+    <button class="btn-verde" onclick="desbanearCuenta()">✅ DESBANEAR</button>
+</div>
+
+<div class="section">
+    <h2>4. ELIMINAR CUENTA</h2>
+    <input id="eliminar-id" placeholder="Pega el ID del usuario a eliminar">
+    <button class="btn-rojo" onclick="eliminarCuenta()">🗑️ ELIMINAR PERMANENTE</button>
+</div>
+
+<div class="section">
+    <h2>5. AGREGAR PRODUCTO NUEVO</h2>
+    <input id="prod-nombre" placeholder="Nombre del producto">
+    <textarea id="prod-desc" placeholder="Descripción del producto"></textarea>
+    <div class="grid-2">
+        <input id="prod-precio-publico" type="number" placeholder="Precio Público $">
+        <input id="prod-precio-socio" type="number" placeholder="Precio Socio $">
+    </div>
+    <input id="prod-cat" value="Bot" placeholder="Categoría: Bot, Página Web, etc">
+    <button class="btn-verde" onclick="agregarProducto()">➕ AGREGAR PRODUCTO</button>
+</div>
+
+<div class="section">
+    <h2>6. TODOS LOS PRODUCTOS</h2>
+    <div id="lista-todos-productos"><p style="color:#94a3b8">Cargando...</p></div>
+</div>
+
+<div class="section">
+    <h2>7. TODOS LOS USUARIOS</h2>
+    <table id="tabla-usuarios">
+        <thead>
+            <tr><th>Nombre</th><th>Email</th><th>ID</th><th>Saldo</th><th>Estado</th></tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<div class="section">
+    <h2>8. PEDIDOS DE PAGO</h2>
+    <table id="tabla-pedidos">
+        <thead>
+            <tr><th>Fecha</th><th>Cliente</th><th>Producto</th><th>Precio</th><th>Vendido por</th></tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<div class="section">
+    <h2>9. PEDIDOS PERSONALIZADOS - PÁGINAS WEB</h2>
+    <div id="lista-pedidos-personalizados"><p style="color:#94a3b8">Cargando...</p></div>
+</div>
 
 <script>
-const firebaseConfig = { /* TU MISMO CONFIG */
+const firebaseConfig = {
   apiKey: "AIzaSyDbJy6E0nDuOQtPgDthl2CZFHNwt2wwMds",
   authDomain: "eliezer-store-95bc1.firebaseapp.com",
   databaseURL: "https://eliezer-store-95bc1-default-rtdb.firebaseio.com",
@@ -40,43 +118,242 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const generarID = () => 'ELZ' + Math.floor(100000 + Math.random() * 900000);
 
-window.onload=cargarTodo;
-function cargarTodo(){cargarUsuarios();cargarPedidos();cargarPedidosPersonalizados();cargarSolicitudes();cargarTodosProductos()}
+window.onload = cargarTodo;
+function cargarTodo(){
+    cargarUsuarios();
+    cargarPedidos();
+    cargarPedidosPersonalizados();
+    cargarSolicitudes();
+    cargarTodosProductos();
+    calcularGanancias();
+}
 
+// TIEMPO REAL - Se actualiza solo
 db.ref('pedidos').on('value',()=>{cargarPedidos();cargarPedidosPersonalizados();calcularGanancias()});
 db.ref('usuarios').on('value',cargarUsuarios);
 db.ref('productos').on('value',cargarTodosProductos);
 db.ref('solicitudes_socios').on('value',cargarSolicitudes);
 
-function calcularGanancias(){db.ref('pedidos').once('value').then(s=>{let total=0; s.forEach(x=>{if(x.val().tipo==="Pago") total+=x.val().precio}); document.getElementById('total-ganancias').innerText=total.toFixed(2)})}
+function calcularGanancias(){
+    db.ref('pedidos').once('value').then(s=>{
+        let total=0; 
+        s.forEach(x=>{
+            if(x.val().tipo==="Pago") total+=parseFloat(x.val().precio)
+        }); 
+        document.getElementById('total-ganancias').innerText=total.toFixed(2)
+    })
+}
 
-function cargarSolicitudes(){db.ref('solicitudes_socios').once('value').then(s=>{let d=document.getElementById('lista-solicitudes');d.innerHTML='';if(!s.exists())d.innerHTML='<p style="color:#94a3b8">No hay solicitudes</p>';
-s.forEach(x=>d.innerHTML+=`<div class="solicitud"><p><b>Nombre:</b> ${x.val().nombre}</p><p><b>Email:</b> ${x.val().email}</p><button class="btn-verde" onclick="aceptarSocio('${x.key}')">ACEPTAR</button><button class="btn-rojo" onclick="rechazarSocio('${x.key}')">RECHAZAR</button></div>`)})}
+function cargarSolicitudes(){
+    db.ref('solicitudes_socios').on('value',s=>{
+        let d=document.getElementById('lista-solicitudes');
+        d.innerHTML='';
+        if(!s.exists()){d.innerHTML='<p style="color:#94a3b8">No hay solicitudes pendientes</p>';return}
+        s.forEach(x=>{
+            let sol = x.val();
+            d.innerHTML+=`<div class="solicitud">
+                <p><b>Nombre:</b> ${sol.nombre}</p>
+                <p><b>Email:</b> ${sol.email}</p>
+                <p><b>Contraseña:</b> ${sol.pass}</p>
+                <button class="btn-verde" onclick="aceptarSocio('${x.key}')">ACEPTAR Y CREAR ID</button>
+                <button class="btn-rojo" onclick="rechazarSocio('${x.key}')">RECHAZAR</button>
+            </div>`
+        })
+    })
+}
 
-function aceptarSocio(id){db.ref('solicitudes_socios/'+id).once('value').then(s=>{let sol=s.val();let nuevoID = generarID();
-db.ref('usuarios').push({nombre:sol.nombre,email:sol.email,pass:sol.pass,saldo:0,idRecarga:nuevoID,baneado:false});
-db.ref('solicitudes_socios/'+id).remove();alert('Socio ACEPTADO! ID: '+nuevoID)})}
+function aceptarSocio(id){
+    db.ref('solicitudes_socios/'+id).once('value').then(s=>{
+        let sol=s.val();
+        let nuevoID = generarID();
+        db.ref('socios/'+nuevoID).set({
+            nombre:sol.nombre,
+            email:sol.email,
+            pass:sol.pass,
+            idRecarga:nuevoID,
+            baneado:false
+        });
+        db.ref('solicitudes_socios/'+id).remove();
+        alert('✅ Socio ACEPTADO!\n\nDale este ID al socio: '+nuevoID)
+    })
+}
 
-function rechazarSocio(id){db.ref('solicitudes_socios/'+id).remove()}
+function rechazarSocio(id){
+    if(confirm('¿Seguro que quieres rechazar esta solicitud?')){
+        db.ref('solicitudes_socios/'+id).remove()
+    }
+}
 
-function banearCuenta(){let id=document.getElementById('ban-id').value.toUpperCase();db.ref('usuarios').once('value').then(s=>{s.forEach(u=>{if(u.val().idRecarga===id) db.ref('usuarios/'+u.key+'/baneado').set(true)})})}
+function banearCuenta(){
+    let id=document.getElementById('ban-id').value.toUpperCase();
+    if(!id) return alert('Escribe un ID');
+    db.ref('socios').once('value').then(s=>{
+        let encontrado = false;
+        s.forEach(u=>{
+            if(u.val().idRecarga===id){
+                db.ref('socios/'+u.key+'/baneado').set(true);
+                encontrado = true;
+                alert('🚫 Socio baneado: '+id)
+            }
+        });
+        if(!encontrado) alert('No se encontró ese ID')
+    })
+}
 
-function desbanearCuenta(){let id=document.getElementById('ban-id').value.toUpperCase();db.ref('usuarios').once('value').then(s=>{s.forEach(u=>{if(u.val().idRecarga===id) db.ref('usuarios/'+u.key+'/baneado').set(false)})})}
+function desbanearCuenta(){
+    let id=document.getElementById('ban-id').value.toUpperCase();
+    if(!id) return alert('Escribe un ID');
+    db.ref('socios').once('value').then(s=>{
+        let encontrado = false;
+        s.forEach(u=>{
+            if(u.val().idRecarga===id){
+                db.ref('socios/'+u.key+'/baneado').set(false);
+                encontrado = true;
+                alert('✅ Socio desbaneado: '+id)
+            }
+        });
+        if(!encontrado) alert('No se encontró ese ID')
+    })
+}
 
-function eliminarCuenta(){let id=document.getElementById('eliminar-id').value.toUpperCase();db.ref('usuarios').once('value').then(s=>{s.forEach(u=>{if(u.val().idRecarga===id) db.ref('usuarios/'+u.key).remove()})}
+function eliminarCuenta(){
+    let id=document.getElementById('eliminar-id').value.toUpperCase();
+    if(!id) return alert('Escribe un ID');
+    if(!confirm('¿Seguro que quieres ELIMINAR esta cuenta? No se puede deshacer')) return;
+    db.ref('usuarios').once('value').then(s=>{
+        s.forEach(u=>{
+            if(u.val().idRecarga===id) db.ref('usuarios/'+u.key).remove()
+        });
+        alert('Cuenta eliminada')
+    })
+}
 
-function cargarTodosProductos(){db.ref('productos').once('value').then(s=>{let d=document.getElementById('lista-todos-productos');d.innerHTML='';s.forEach(x=>{let p=x.val();let vendedor=p.idVendedor==='JEFE'?'YO':p.idVendedor;
-d.innerHTML+=`<div class="card-producto"><span class="badge">${p.categoria}</span> <span style="color:#3b82f6">Vendedor: ${vendedor}</span><h4>${p.nombre}</h4><p>${p.descripcion}</p><p><b>Público:</b> $${p.precioPublico} | <b>Socio:</b> $${p.precioSocio}</p><button class="btn-rojo" onclick="borrarProductoAdmin('${x.key}')">BORRAR</button></div>`})})}
+function cargarTodosProductos(){
+    db.ref('productos').on('value',s=>{
+        let d=document.getElementById('lista-todos-productos');
+        d.innerHTML='';
+        if(!s.exists()){d.innerHTML='<p style="color:#94a3b8">No hay productos</p>';return}
+        s.forEach(x=>{
+            let p=x.val();
+            let vendedor=p.idVendedor==='JEFE'?'YO':p.idVendedor;
+            d.innerHTML+=`<div class="card-producto">
+                <span class="badge">${p.categoria}</span> 
+                <span style="color:#3b82f6;font-size:12px">Vendedor: ${vendedor}</span>
+                <h4>${p.nombre}</h4>
+                <p style="color:#94a3b8;font-size:13px">${p.descripcion}</p>
+                <p><b>Público:</b> $${p.precioPublico} | <b>Socio:</b> $${p.precioSocio}</p>
+                <button class="btn-rojo" onclick="borrarProductoAdmin('${x.key}')">BORRAR</button>
+            </div>`
+        })
+    })
+}
 
-function borrarProductoAdmin(id){db.ref('productos/'+id).remove()}
+function borrarProductoAdmin(id){
+    if(confirm('¿Borrar este producto?')) db.ref('productos/'+id).remove()
+}
 
-function cargarUsuarios(){db.ref('usuarios').once('value').then(s=>{let t=document.querySelector('#tabla-usuarios tbody');t.innerHTML='';s.forEach(x=>{let u=x.val();t.innerHTML+=`<tr><td>${u.nombre}</td><td>${u.email}</td><td style="color:#3b82f6">${u.idRecarga}</td><td style="color:#22c55e">$${u.saldo.toFixed(2)}</td><td>${u.baneado?'<span style="color:#ef4444">BANEADO</span>':'<span style="color:#22c55e">ACTIVO</span>'}</td></tr>`})})}
+function cargarUsuarios(){
+    db.ref('usuarios').on('value',s=>{
+        let t=document.querySelector('#tabla-usuarios tbody');
+        t.innerHTML='';
+        s.forEach(x=>{
+            let u=x.val();
+            t.innerHTML+=`<tr>
+                <td>${u.nombre}</td>
+                <td>${u.email}</td>
+                <td style="color:#3b82f6">${u.idRecarga}</td>
+                <td style="color:#22c55e">$${u.saldo.toFixed(2)}</td>
+                <td>${u.baneado?'<span style="color:#ef4444">BANEADO</span>':'<span style="color:#22c55e">ACTIVO</span>'}</td>
+            </tr>`
+        })
+    })
+}
 
-function cargarPedidos(){db.ref('pedidos').once('value').then(s=>{let t=document.querySelector('#tabla-pedidos tbody');t.innerHTML='';s.forEach(x=>{if(x.val().tipo==="Pago") t.innerHTML+=`<tr><td>${x.val().fecha}</td><td>${x.val().cliente}</td><td>${x.val().producto}</td><td>$${x.val().precio}</td><td>${x.val().vendedor}</td></tr>`})}
+function cargarPedidos(){
+    db.ref('pedidos').on('value',s=>{
+        let t=document.querySelector('#tabla-pedidos tbody');
+        t.innerHTML='';
+        s.forEach(x=>{
+            if(x.val().tipo==="Pago"){
+                let p = x.val();
+                t.innerHTML+=`<tr>
+                    <td>${p.fecha}</td>
+                    <td>${p.cliente}</td>
+                    <td>${p.producto}</td>
+                    <td>$${p.precio}</td>
+                    <td>${p.vendedor}</td>
+                </tr>`
+            }
+        })
+    })
+}
 
-function cargarPedidosPersonalizados(){db.ref('pedidos').once('value').then(s=>{let d=document.getElementById('lista-pedidos-personalizados');d.innerHTML='';s.forEach(x=>{if(x.val().tipo==="Pedido Personalizado") d.innerHTML+=`<div class="pedido-personalizado"><p><b>Fecha:</b> ${x.val().fecha}</p><p><b>Cliente:</b> ${x.val().cliente}</p><p><b>ID:</b> ${x.val().idRecarga}</p><p><b>Producto:</b> ${x.val().producto}</p><p><b>Descripción:</b></p><p style="background:#050a1a;padding:10px;border-radius:8px">${x.val().descripcion}</p></div>`})})}
+function cargarPedidosPersonalizados(){
+    db.ref('pedidos').on('value',s=>{
+        let d=document.getElementById('lista-pedidos-personalizados');
+        d.innerHTML='';
+        let hay = false;
+        s.forEach(x=>{
+            if(x.val().tipo==="Pedido Personalizado"){
+                hay = true;
+                let p = x.val();
+                d.innerHTML+=`<div class="pedido-personalizado">
+                    <p><b>Fecha:</b> ${p.fecha}</p>
+                    <p><b>Cliente:</b> ${p.cliente}</p>
+                    <p><b>ID:</b> <span style="color:#3b82f6">${p.idRecarga}</span></p>
+                    <p><b>Producto:</b> ${p.producto}</p>
+                    <p><b>Descripción:</b></p>
+                    <p style="background:#050a1a;padding:10px;border-radius:8px">${p.descripcion}</p>
+                </div>`
+            }
+        });
+        if(!hay) d.innerHTML='<p style="color:#94a3b8">No hay pedidos personalizados</p>'
+    })
+}
 
-function agregarProducto(){let n=document.getElementById('prod-nombre').value;let d=document.getElementById('prod-desc').value;let pp=document.getElementById('prod-precio-publico').value;let ps=document.getElementById('prod-precio-socio').value;let c=document.getElementById('prod-cat').value;if(!n||!pp||!ps||!c)return alert('Llena todo');db.ref('productos').push({nombre:n,descripcion:d,precioPublico:parseFloat(pp),precioSocio:parseFloat(ps),categoria:c,idVendedor:'JEFE'})}
+function agregarProducto(){
+    let n=document.getElementById('prod-nombre').value;
+    let d=document.getElementById('prod-desc').value;
+    let pp=document.getElementById('prod-precio-publico').value;
+    let ps=document.getElementById('prod-precio-socio').value;
+    let c=document.getElementById('prod-cat').value;
+    if(!n||!pp||!ps||!c) return alert('Llena todos los campos');
+    
+    db.ref('productos').push({
+        nombre:n,
+        descripcion:d,
+        precioPublico:parseFloat(pp),
+        precioSocio:parseFloat(ps),
+        categoria:c,
+        idVendedor:'JEFE'
+    });
+    alert('Producto agregado');
+    document.getElementById('prod-nombre').value='';
+    document.getElementById('prod-desc').value='';
+    document.getElementById('prod-precio-publico').value='';
+    document.getElementById('prod-precio-socio').value='';
+}
 
-function recargarSaldo(){let id=document.getElementById('rec-id').value;let m=parseFloat(document.getElementById('rec-monto').value);db.ref('usuarios').once('value').then(s=>{s.forEach(u=>{if(u.val().idRecarga===id) db.ref('usuarios/'+u.key+'/saldo').set(u.val().saldo + m)})})}
-</script></body></html>
+function recargarSaldo(){
+    let id=document.getElementById('rec-id').value.toUpperCase();
+    let m=parseFloat(document.getElementById('rec-monto').value);
+    if(!id||!m) return alert('Llena ID y Monto');
+    
+    db.ref('usuarios').once('value').then(s=>{
+        let encontrado = false;
+        s.forEach(u=>{
+            if(u.val().idRecarga===id){
+                let saldoNuevo = u.val().saldo + m;
+                db.ref('usuarios/'+u.key+'/saldo').set(saldoNuevo);
+                document.getElementById('rec-msg').innerText=`✅ Recargados $${m} a ${u.val().nombre}`;
+                document.getElementById('rec-id').value='';
+                document.getElementById('rec-monto').value='';
+                encontrado = true;
+            }
+        });
+        if(!encontrado) document.getElementById('rec-msg').innerText='❌ ID no encontrado'
+    })
+}
+</script>
+</body>
+</html>
