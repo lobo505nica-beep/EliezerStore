@@ -16,8 +16,7 @@
 .login-box h2 { font-size: 1.6rem; color: #0d47a1; margin: 5px 0; font-weight: 700; }
 .login-box h3 { font-size: 1rem; color: #666; margin-bottom: 25px; font-weight: 400; }
 .login-box input,.login-box select { width: 100%; padding: 14px; margin: 10px 0; border-radius: 10px; border: 1.5px solid #ccc; font-size: 1rem; font-family: 'Inter'; }
-.login-box input:focus,.login-box select:focus { border-color: #1976d2; outline: none; }
-.btn { width: 100%; padding: 14px; background: #1976d2; color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 1.1rem; font-family: 'Inter'; transition: 0.2s; }
+.btn { width: 100%; padding: 14px; background: #1976d2; color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 1.1rem; }
 .btn:hover { background: #1565c0; }
 .btn-salir { background: #d32f2f; font-size: 0.9rem; padding: 8px 12px; margin-top: 10px; }
 
@@ -40,12 +39,12 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; z-index: 10;
         }
         #caja-pregunta h3 { color: #0d47a1; margin-top: 0; font-size: 1.3rem; font-weight: 600; }
-.opcion { display: block; width: 100%; padding: 14px; margin: 10px 0; border: 1.5px solid #e0e0e0; border-radius: 10px; background: #fafafa; cursor: pointer; font-size: 1.05rem; transition: 0.2s; font-weight: 600; font-family: 'Inter'; text-align: left; }
+.opcion { display: block; width: 100%; padding: 14px; margin: 10px 0; border: 1.5px solid #e0e0e0; border-radius: 10px; background: #fafafa; cursor: pointer; font-size: 1.05rem; text-align: left; }
 .opcion:hover { background: #e3f2fd; border-color: #1976d2; }
         #progreso { margin-top: 15px; font-weight: 700; color: #388e3c; font-size: 1.1rem; }
         #feedback { font-size: 1.2rem; font-weight: 700; height: 32px; }
 .bien { color: #388e3c; }.mal { color: #d32f2f; }
-.info-jugador { position: absolute; top: 15px; left: 15px; background: white; padding: 12px 18px; border-radius: 10px; z-index: 5; font-size: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 600; }
+.info-jugador { position: absolute; top: 15px; left: 15px; background: white; padding: 12px 18px; border-radius: 10px; z-index: 5; font-size: 1rem; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -55,7 +54,6 @@
             <div class="logo">🎓</div>
             <h2>Camino a la Escuela</h2>
             <h3>Instituto Rodolfo Reyes Toruño</h3>
-            <p style="font-size: 0.95rem; color: #1976d2; font-weight: 600;">Computación: Interfaz y Diagrama de Flujo</p>
             <form id="form-login">
                 <input type="text" id="nombre" placeholder="Nombre Completo" required>
                 <select id="grado" required>
@@ -64,7 +62,7 @@
                     <option>10mo</option><option>11mo</option>
                 </select>
                 <input type="text" id="seccion" placeholder="Sección: A, B, C" required>
-                <button type="submit" class="btn">▶ IR AL JUEGO</button> <!-- CAMBIADO -->
+                <button type="submit" class="btn">▶ IR AL JUEGO</button>
             </form>
         </div>
     </div>
@@ -72,7 +70,7 @@
     <div id="game-screen">
         <div class="info-jugador">
             <b id="jugador-nombre"></b> - <span id="jugador-grado"></span>
-            <button class="btn-salir" onclick="salir()">Cerrar Sesión</button> <!-- CAMBIADO -->
+            <button class="btn-salir" onclick="salir()">Cerrar Sesión</button>
         </div>
 
         <div id="escuela">🏫</div>
@@ -105,32 +103,27 @@
         ];
         let preguntasUsadas = []; let preguntaActual = 0; let fallos = 0; let pasos = 0; let anchoPantalla; let bloqueado = false;
 
-        // YA NO CARGA AUTOMATICO. SIEMPRE EMPIEZA EN LOGIN
-        window.onload = function() {
-            // BORRAMOS EL LOCALSTORAGE PARA QUE NO SE QUEDE PEGADO
-            // localStorage.removeItem('estudianteRRT');
-        }
+        // QUITÉ EL AUTOLOGIN. AHORA SIEMPRE EMPIEZA EN LOGIN
+        window.onload = function() { }
 
         document.getElementById('form-login').onsubmit = function(e) {
             e.preventDefault();
             estudiante = { nombre: document.getElementById('nombre').value, grado: document.getElementById('grado').value, seccion: document.getElementById('seccion').value };
-            localStorage.setItem('estudianteRRT', JSON.stringify(estudiante));
-            entrarAlJuego(); // AQUI VA DIRECTO AL JUEGO
+            entrarAlJuego(); // VA DIRECTO
         }
 
         function entrarAlJuego() {
             document.getElementById('jugador-nombre').innerText = estudiante.nombre;
-            document.getElementById('jugador-grado').innerText = estudiante.grado + " + estudiante.seccion; // ARREGLADO
-            document.getElementById('login-screen').style.display = 'none'; // ESCONDE LOGIN
-            document.getElementById('game-screen').style.display = 'block'; // MUESTRA JUEGO
+            document.getElementById('jugador-grado').innerText = estudiante.grado + " + estudiante.seccion;
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'block';
             anchoPantalla = window.innerWidth - 280;
             reiniciarPartida();
         }
 
         function salir() {
-            if(confirm("¿Seguro que quieres salir? Se borrarán tus datos.")) {
-                localStorage.removeItem('estudianteRRT');
-                location.reload(); // RECARGA Y VUELVE AL LOGIN
+            if(confirm("¿Cerrar sesión para el siguiente alumno?")) {
+                location.reload(); // SOLO RECARGA. VUELVE AL LOGIN LIMPIO
             }
         }
 
@@ -174,15 +167,12 @@
         }
 
         function finalizarJuego() {
-            if(fallos > 0) { alert(`Fallaste ${fallos} pregunta(s). Reiniciando desde el comienzo.`); reiniciarPartida(); return; }
-            estudiante.completado = true; estudiante.fecha = new Date().toLocaleString(); guardarIntento(estudiante);
+            if(fallos > 0) { alert(`Fallaste ${fallos} pregunta(s). Reiniciando.`); reiniciarPartida(); return; }
             document.getElementById('caja-pregunta').innerHTML = `
                 <h2>¡Excelente ${estudiante.nombre}!</h2>
-                <p style="font-size: 1.1rem;">Completaste las 10 preguntas de Computación.<br>El estudiante llegó a la escuela.</p>
+                <p style="font-size: 1.1rem;">Completaste las 10 preguntas.<br>El estudiante llegó a la escuela.</p>
                 <button class="btn" onclick="reiniciarPartida()">Jugar de Nuevo</button>`;
         }
-
-        function guardarIntento(dato) { let lista = JSON.parse(localStorage.getItem('estudiantesRRT') || '[]'); lista.push(dato); localStorage.setItem('estudiantesRRT', JSON.stringify(lista)); }
     </script>
 </body>
 </html>
