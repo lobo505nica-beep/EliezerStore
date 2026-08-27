@@ -16,7 +16,7 @@ body{font-family:Arial;overflow:hidden}
 
 #juego{display:none;height:100vh;width:100vw;position:relative;background:linear-gradient(180deg,#87CEEB 0%,#87CEEB 55%,#2E8B57 55%)}
 #escuela{position:absolute;right:3%;bottom:22%;font-size:8vw}
-#personaje{position:absolute;bottom:10%;left:3%;font-size:7vw; /* PERSONA GRANDE */ transition:left 0.8s ease-in-out;z-index:5;filter:drop-shadow(3px 5px 8px #0003);transform:scaleX(1)} /* MIRANDO A LA DERECHA */
+#personaje{position:absolute;bottom:10%;left:3%;font-size:7vw;transition:left 0.8s ease-in-out;z-index:5;filter:drop-shadow(3px 5px 8px #0003);transform:scaleX(-1)} /* AQUI ESTA EL CAMBIO: -1 PARA QUE MIRE A LA DERECHA */
 #calle{position:absolute;bottom:10%;width:100%;height:12%;background:#444;z-index:2}
 #linea{position:absolute;bottom:16%;width:100%;border-top:4px dashed yellow;z-index:3}
 
@@ -40,7 +40,6 @@ body{font-family:Arial;overflow:hidden}
   <div class="login-box">
     <h2>🎓 Camino a la Escuela</h2>
     <p><b>Instituto Rodolfo Reyes Toruño</b></p>
-    <p>Computación: Interfaz y Diagramas</p>
     <input id="nombre" placeholder="Nombre Completo" required>
     <select id="grado" required><option value="">Selecciona Grado</option><option>7mo</option><option>8vo</option><option>9no</option><option>10mo</option><option>11mo</option></select>
     <input id="seccion" placeholder="Sección: A, B, C" required>
@@ -52,7 +51,7 @@ body{font-family:Arial;overflow:hidden}
   <div class="info"><span id="n"></span> - <span id="g"></span> <button onclick="location.reload()" style="margin-left:15px;padding:5px 10px">Salir</button></div>
 
   <div id="escuela">🏫</div>
-  <div id="personaje">🚶‍♂️</div> <!-- YA MIRA HACIA LA ESCUELA -->
+  <div id="personaje">🚶‍♂️</div>
   <div id="linea"></div>
   <div id="calle"></div>
 
@@ -95,16 +94,15 @@ function entrar(){
 function siguientePregunta(){
   if(numPregunta>=10){
     if(fallos>0){
-      alert("Fallaste "+fallos+" pregunta(s). Reiniciando desde el inicio.");
+      alert("Fallaste "+fallos+" pregunta(s). Reiniciando.");
       numPregunta=0;fallos=0;pasos=0;usadas=[];
       document.getElementById('personaje').style.left='3%';
     }else{
-      document.getElementById('pregunta').innerHTML="<h2>¡FELICIDADES "+estudiante.nombre+"! 🎉</h2><p style='font-size:20px'>Llegaste a la escuela. Respondiste las 10 bien.</p><button class='btn' onclick='location.reload()'>Jugar de Nuevo</button>";
+      document.getElementById('pregunta').innerHTML="<h2>¡FELICIDADES "+estudiante.nombre+"! 🎉</h2><p>Llegaste a la escuela</p><button class='btn' onclick='location.reload()'>Jugar de Nuevo</button>";
       return;
     }
   }
-  bloqueado=false;
-  document.getElementById('feedback').innerHTML="";
+  bloqueado=false;document.getElementById('feedback').innerHTML="";
   let i;do{i=Math.floor(Math.random()*banco.length)}while(usadas.includes(i));usadas.push(i);
   let preg=banco[i];
   document.getElementById('texto').innerText=preg.q;
@@ -112,26 +110,23 @@ function siguientePregunta(){
   let cont=document.getElementById('ops');cont.innerHTML="";
   preg.ops.forEach((op,idx)=>{
     let b=document.createElement('button');b.className='opcion';b.innerText=op;
-    b.onclick=function(){responder(idx==preg.r,b)};
+    b.onclick=function(){responder(idx==preg.r)};
     cont.appendChild(b);
   });
 }
 
-function responder(esCorrecta,boton){
+function responder(esCorrecta){
   if(bloqueado)return; bloqueado=true;
-  let botones=document.querySelectorAll('.opcion');
-  botones.forEach(b=>b.disabled=true);
+  document.querySelectorAll('.opcion').forEach(b=>b.disabled=true);
 
   if(esCorrecta){
     document.getElementById('feedback').innerHTML="<span class='bien'>✓ CORRECTO</span>";
     pasos++;
-    document.getElementById('personaje').style.left=(3+((90-7)/10)*pasos)+"%"; // CAMINA NORMAL HACIA LA ESCUELA
-    numPregunta++;
-    setTimeout(siguientePregunta,1800);
+    document.getElementById('personaje').style.left=(3+((90-7)/10)*pasos)+"%";
+    numPregunta++;setTimeout(siguientePregunta,1800);
   }else{
     document.getElementById('feedback').innerHTML="<span class='mal'>✖ INCORRECTO</span>";
-    fallos++;numPregunta++;
-    setTimeout(siguientePregunta,1800);
+    fallos++;numPregunta++;setTimeout(siguientePregunta,1800);
   }
 }
 </script>
