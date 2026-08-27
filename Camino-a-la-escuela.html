@@ -1,178 +1,99 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Camino a la Escuela - RRT</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        * { box-sizing: border-box; }
-        html { font-size: 16px; }
-        body { font-family: 'Inter', Arial; background: linear-gradient(180deg, #87CEEB 0%, #87CEEB 55%, #3cb371 55%); margin: 0; overflow: hidden; }
-
-        #login-screen { display: flex; justify-content: center; align-items: center; height: 100vh; background: #0d47a1; }
-.login-box { background: white; padding: 40px; border-radius: 16px; width: 420px; text-align: center; box-shadow: 0 12px 40px rgba(0,0,0,0.25); }
-.login-box.logo { font-size: 3.5rem; }
-.login-box h2 { font-size: 1.6rem; color: #0d47a1; margin: 5px 0; font-weight: 700; }
-.login-box h3 { font-size: 1rem; color: #666; margin-bottom: 25px; font-weight: 400; }
-.login-box input,.login-box select { width: 100%; padding: 14px; margin: 10px 0; border-radius: 10px; border: 1.5px solid #ccc; font-size: 1rem; font-family: 'Inter'; }
-.btn { width: 100%; padding: 14px; background: #1976d2; color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 1.1rem; }
-.btn:hover { background: #1565c0; }
-.btn-salir { background: #d32f2f; font-size: 0.9rem; padding: 8px 12px; margin-top: 10px; }
-
-        #game-screen { display: none; height: 100vh; position: relative; }
-        #pasto { position: absolute; bottom: 0; width: 100%; height: 220px; background: #388e3c; z-index: 1; }
-        #calle { position: absolute; bottom: 80px; width: 100%; height: 130px; background: #616161; z-index: 2; }
-        #linea { position: absolute; bottom: 145px; width: 100%; border-top: 6px dashed #ffeb3b; z-index: 3; }
-        #escuela { position: absolute; right: 40px; bottom: 190px; font-size: 5.5em; z-index: 2; }
-
-        #personaje {
-            position: absolute; bottom: 90px; left: 40px; z-index: 4; transition: left 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 4.5em; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
-        }
-        #personaje.caminando { animation: caminar 0.7s; }
-        @keyframes caminar { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-
-        #caja-pregunta {
-            position: absolute; top: 30px; left: 50%; transform: translateX(-50%);
-            background: white; padding: 30px; border-radius: 16px; width: 90%; max-width: 650px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; z-index: 10;
-        }
-        #caja-pregunta h3 { color: #0d47a1; margin-top: 0; font-size: 1.3rem; font-weight: 600; }
-.opcion { display: block; width: 100%; padding: 14px; margin: 10px 0; border: 1.5px solid #e0e0e0; border-radius: 10px; background: #fafafa; cursor: pointer; font-size: 1.05rem; text-align: left; }
-.opcion:hover { background: #e3f2fd; border-color: #1976d2; }
-        #progreso { margin-top: 15px; font-weight: 700; color: #388e3c; font-size: 1.1rem; }
-        #feedback { font-size: 1.2rem; font-weight: 700; height: 32px; }
-.bien { color: #388e3c; }.mal { color: #d32f2f; }
-.info-jugador { position: absolute; top: 15px; left: 15px; background: white; padding: 12px 18px; border-radius: 10px; z-index: 5; font-size: 1rem; font-weight: 600; }
-    </style>
+<meta charset="UTF-8">
+<title>Camino a la Escuela - RRT</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+body{margin:0;font-family:'Inter';overflow:hidden;background:linear-gradient(180deg,#87CEEB 0%,#87CEEB 60%,#3cb371 60%)}
+#login{display:flex;justify-content:center;align-items:center;height:100vh;background:#0d47a1}
+.login-box{background:#fff;padding:40px;border-radius:16px;width:400px;text-align:center}
+.login-box h2{color:#0d47a1}
+.login-box input,.login-box select{width:100%;padding:14px;margin:10px 0;border-radius:10px;border:1.5px solid #ccc;font-size:16px}
+.btn{width:100%;padding:14px;background:#1976d2;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:17px;cursor:pointer}
+#juego{display:none;height:100vh;position:relative}
+#escuela{position:absolute;right:40px;bottom:200px;font-size:80px}
+#personaje{position:absolute;bottom:100px;left:40px;font-size:70px;transition:left 0.8s}
+#calle{position:absolute;bottom:90px;width:100%;height:120px;background:#555}
+#pregunta{position:absolute;top:30px;left:50%;transform:translateX(-50%);background:#fff;padding:30px;border-radius:16px;width:600px;text-align:center}
+.opcion{display:block;width:100%;padding:14px;margin:10px 0;border:1px solid #ccc;border-radius:10px;background:#f5f5f5;font-size:16px;cursor:pointer}
+.info{position:absolute;top:15px;left:15px;background:#fff;padding:10px 15px;border-radius:10px}
+</style>
 </head>
 <body>
 
-    <div id="login-screen">
-        <div class="login-box">
-            <div class="logo">🎓</div>
-            <h2>Camino a la Escuela</h2>
-            <h3>Instituto Rodolfo Reyes Toruño</h3>
-            <form id="form-login">
-                <input type="text" id="nombre" placeholder="Nombre Completo" required>
-                <select id="grado" required>
-                    <option value="">Selecciona tu Grado</option>
-                    <option>7mo</option><option>8vo</option><option>9no</option>
-                    <option>10mo</option><option>11mo</option>
-                </select>
-                <input type="text" id="seccion" placeholder="Sección: A, B, C" required>
-                <button type="submit" class="btn">▶ IR AL JUEGO</button>
-            </form>
-        </div>
-    </div>
+<div id="login">
+  <div class="login-box">
+    <h2>🎓 Camino a la Escuela</h2>
+    <p>Instituto Rodolfo Reyes Toruño</p>
+    <input id="nombre" placeholder="Nombre Completo" required>
+    <select id="grado" required><option value="">Grado</option><option>7mo</option><option>8vo</option><option>9no</option><option>10mo</option><option>11mo</option></select>
+    <input id="seccion" placeholder="Sección A,B,C" required>
+    <button class="btn" onclick="entrar()">IR AL JUEGO</button>
+  </div>
+</div>
 
-    <div id="game-screen">
-        <div class="info-jugador">
-            <b id="jugador-nombre"></b> - <span id="jugador-grado"></span>
-            <button class="btn-salir" onclick="salir()">Cerrar Sesión</button>
-        </div>
+<div id="juego">
+  <div class="info"><b id="n"></b> - <span id="g"></span> <button onclick="location.reload()" style="margin-left:10px">Salir</button></div>
+  <div id="escuela">🏫</div>
+  <div id="personaje">🚶‍♂️</div>
+  <div id="calle"></div>
+  <div id="pregunta">
+    <h3 id="texto">Cargando...</h3>
+    <div id="ops"></div>
+    <p id="prog">1 de 10</p>
+  </div>
+</div>
 
-        <div id="escuela">🏫</div>
-        <div id="personaje">🚶‍♂️</div>
-        <div id="linea"></div>
-        <div id="calle"></div>
-        <div id="pasto"></div>
+<script>
+let estudiante={}, p=0, fallos=0, paso=0, usadas=[];
+let preguntas=[
+{q:"¿Qué es la interfaz de un software?",ops:["A. Código","B. Parte visual con botones","C. Compilador","D. Variable"],r:1},
+{q:"¿Qué es un compilador?",ops:["A. Traduce código a máquina","B. Impresora","C. Antivirus","D. Navegador"],r:0},
+{q:"¿Para qué sirve un IDE?",ops:["A. Jugar","B. Programar","C. Navegar","D. Dibujar"],r:1},
+{q:"¿Qué figura es Inicio/Fin en diagrama?",ops:["A. Rectángulo","B. Óvalo","C. Rombo","D. Flecha"],r:1},
+{q:"¿Qué es un Debugger?",ops:["A. Editor","B. Corrige errores","C. Navegador","D. Excel"],r:1},
+{q:"¿Qué figura es una Decisión?",ops:["A. Óvalo","B. Rectángulo","C. Rombo","D. Círculo"],r:2},
+{q:"¿Qué NO es parte de la interfaz?",ops:["A. Menú","B. Botón","C. CPU","D. Consola"],r:2},
+{q:"¿Qué son los datos en un diagrama?",ops:["A. Procesos","B. Información que entra/sale","C. Flechas","D. Inicio"],r:1},
+{q:"¿Qué herramienta escribe código?",ops:["A. Editor de código","B. Mouse","C. Monitor","D. Teclado"],r:0},
+{q:"¿Qué hacen las flechas en un diagrama?",ops:["A. Procesos","B. Flujo de datos","C. Decisiones","D. Fin"],r:1}
+];
 
-        <div id="caja-pregunta">
-            <h3 id="texto-pregunta">Cargando pregunta...</h3>
-            <div id="feedback"></div>
-            <div id="opciones"></div>
-            <p id="progreso">Pregunta 1 de 10</p>
-        </div>
-    </div>
+function entrar(){
+  estudiante.nombre=document.getElementById('nombre').value;
+  estudiante.grado=document.getElementById('grado').value;
+  estudiante.seccion=document.getElementById('seccion').value;
+  if(estudiante.nombre==""||estudiante.grado==""||estudiante.seccion==""){alert("Completa todo");return;}
+  document.getElementById('n').innerText=estudiante.nombre;
+  document.getElementById('g').innerText=estudiante.grado+" "+estudiante.seccion;
+  document.getElementById('login').style.display='none';
+  document.getElementById('juego').style.display='block';
+  siguiente();
+}
 
-    <script>
-        let estudiante = {};
-        let bancoPreguntas = [
-            {q: "¿Qué es la interfaz de un software de programación?", ops: ["A. El código fuente", "B. La parte visual con botones y menús", "C. El compilador", "D. Una variable"], res: 1},
-            {q: "¿Cuál es una herramienta del software de programación?", ops: ["A. Editor de código", "B. Monitor", "C. Teclado", "D. Mouse"], res: 0},
-            {q: "¿Para qué sirve un sistema de programación?", ops: ["A. Para jugar", "B. Para crear y ejecutar programas", "C. Para navegar", "D. Para dibujar"], res: 1},
-            {q: "¿Qué representa un óvalo en un diagrama de flujo de datos?", ops: ["A. Proceso", "B. Inicio/Fin", "C. Decisión", "D. Datos"], res: 1},
-            {q: "¿Qué es un compilador?", ops: ["A. Una herramienta que traduce código a lenguaje máquina", "B. Una impresora", "C. Un antivirus", "D. Un navegador"], res: 0},
-            {q: "En un diagrama de flujo, ¿qué figura es un rombo?", ops: ["A. Proceso", "B. Entrada/Salida", "C. Decisión", "D. Conector"], res: 2},
-            {q: "¿Qué herramienta sirve para depurar errores en el código?", ops: ["A. Debugger", "B. Paint", "C. Word", "D. Excel"], res: 0},
-            {q: "¿Qué son los datos en un diagrama de flujo de datos?", ops: ["A. Las flechas", "B. La información que entra y sale", "C. Los procesos", "D. El inicio"], res: 1},
-            {q: "¿Cuál NO es parte de la interfaz de un IDE?", ops: ["A. Barra de herramientas", "B. Consola", "C. CPU", "D. Área de código"], res: 2},
-            {q: "¿Qué hace un depurador?", ops: ["A. Escribe código solo", "B. Encuentra y corrige errores", "C. Crea gráficos", "D. Diseña páginas web"], res: 1},
-        ];
-        let preguntasUsadas = []; let preguntaActual = 0; let fallos = 0; let pasos = 0; let anchoPantalla; let bloqueado = false;
+function siguiente(){
+  if(p>=10){if(fallos>0){alert("Fallaste "+fallos+". Reiniciando");p=0;fallos=0;paso=0;usadas=[];document.getElementById('personaje').style.left='40px'}else{alert("Ganaste "+estudiante.nombre+"!")}siguiente();return;}
+  let i;do{i=Math.floor(Math.random()*preguntas.length)}while(usadas.includes(i));usadas.push(i);
+  let pregunta=preguntas[i];
+  document.getElementById('texto').innerText=pregunta.q;
+  document.getElementById('prog').innerText="Pregunta "+(p+1)+" de 10";
+  let cont=document.getElementById('ops');cont.innerHTML="";
+  pregunta.ops.forEach((op,idx)=>{
+    let b=document.createElement('button');b.className='opcion';b.innerText=op;
+    b.onclick=()=>responder(idx==pregunta.r);
+    cont.appendChild(b);
+  });
+}
 
-        // QUITÉ EL AUTOLOGIN. AHORA SIEMPRE EMPIEZA EN LOGIN
-        window.onload = function() { }
-
-        document.getElementById('form-login').onsubmit = function(e) {
-            e.preventDefault();
-            estudiante = { nombre: document.getElementById('nombre').value, grado: document.getElementById('grado').value, seccion: document.getElementById('seccion').value };
-            entrarAlJuego(); // VA DIRECTO
-        }
-
-        function entrarAlJuego() {
-            document.getElementById('jugador-nombre').innerText = estudiante.nombre;
-            document.getElementById('jugador-grado').innerText = estudiante.grado + " + estudiante.seccion;
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('game-screen').style.display = 'block';
-            anchoPantalla = window.innerWidth - 280;
-            reiniciarPartida();
-        }
-
-        function salir() {
-            if(confirm("¿Cerrar sesión para el siguiente alumno?")) {
-                location.reload(); // SOLO RECARGA. VUELVE AL LOGIN LIMPIO
-            }
-        }
-
-        function reiniciarPartida() {
-            preguntaActual = 0; fallos = 0; pasos = 0; preguntasUsadas = [];
-            document.getElementById('personaje').style.left = '40px'; siguientePregunta();
-        }
-
-        function siguientePregunta() {
-            if(preguntaActual >= 10) { finalizarJuego(); return; }
-            bloqueado = false; document.getElementById('feedback').innerHTML = "";
-            let index; do { index = Math.floor(Math.random() * bancoPreguntas.length); }
-            while(preguntasUsadas.includes(index)); preguntasUsadas.push(index);
-            let p = bancoPreguntas[index];
-            document.getElementById('texto-pregunta').innerText = p.q;
-            document.getElementById('progreso').innerText = `Pregunta ${preguntaActual + 1} de 10`;
-            let contenedor = document.getElementById('opciones'); contenedor.innerHTML = '';
-            p.ops.forEach((op, i) => {
-                let btn = document.createElement('button'); btn.className = 'opcion'; btn.innerText = op;
-                btn.onclick = () => responder(i === p.res); contenedor.appendChild(btn);
-            });
-        }
-
-        function responder(correcta) {
-            if(bloqueado) return; bloqueado = true; let feedback = document.getElementById('feedback'); let personaje = document.getElementById('personaje');
-            if(correcta) {
-                feedback.innerHTML = '<span class="bien">✓ Correcto</span>';
-                personaje.classList.add('caminando');
-                setTimeout(() => personaje.classList.remove('caminando'), 700);
-                darPaso(); preguntaActual++;
-                setTimeout(() => { siguientePregunta(); }, 1500);
-            } else {
-                fallos++; feedback.innerHTML = '<span class="mal">✖ Incorrecto</span>';
-                preguntaActual++; setTimeout(() => { siguientePregunta(); }, 1500);
-            }
-        }
-
-        function darPaso() {
-            pasos++; let nuevaPos = 40 + (anchoPantalla / 10) * pasos;
-            document.getElementById('personaje').style.left = nuevaPos + 'px';
-        }
-
-        function finalizarJuego() {
-            if(fallos > 0) { alert(`Fallaste ${fallos} pregunta(s). Reiniciando.`); reiniciarPartida(); return; }
-            document.getElementById('caja-pregunta').innerHTML = `
-                <h2>¡Excelente ${estudiante.nombre}!</h2>
-                <p style="font-size: 1.1rem;">Completaste las 10 preguntas.<br>El estudiante llegó a la escuela.</p>
-                <button class="btn" onclick="reiniciarPartida()">Jugar de Nuevo</button>`;
-        }
-    </script>
+function responder(correcta){
+  if(correcta){
+    document.getElementById('personaje').style.left=(40+((window.innerWidth-300)/10)*(paso+1))+'px';
+    paso++;p++;setTimeout(siguiente,1000);
+  }else{
+    fallos++;p++;setTimeout(siguiente,1000);
+  }
+}
+</script>
 </body>
 </html>
