@@ -5,61 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Camino a la Escuela - RRT</title>
     <style>
-        html { font-size: 18px; }
-        body { font-family: 'Segoe UI', Arial; background: linear-gradient(to top, #87CEEB 0%, #87CEEB 60%, #a3d9ff 60%); margin: 0; overflow: hidden; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        * { box-sizing: border-box; }
+        html { font-size: 16px; } /* TAMAÑO NORMAL */
+        body { font-family: 'Inter', Arial; background: linear-gradient(180deg, #87CEEB 0%, #87CEEB 55%, #3cb371 55%); margin: 0; overflow: hidden; }
 
-        #login-screen { display: flex; justify-content: center; align-items: center; height: 100vh; background: #1a5276; }
-.login-box { background: white; padding: 40px; border-radius: 20px; width: 450px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.3); }
-.login-box h2 { font-size: 1.8rem; color: #1a5276; }
-.login-box input,.login-box select { width: 100%; padding: 15px; margin: 12px 0; border-radius: 10px; border: 2px solid #ccc; box-sizing: border-box; font-size: 1.1rem; }
-.btn { width: 100%; padding: 16px; background: #27ae60; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1.3rem; }
-.btn:hover { background: #229954; }
-.btn-salir { background: #e74c3c; margin-top: 10px; font-size: 1rem; padding: 10px; }
+        /* LOGIN LIMPIO Y PRO */
+        #login-screen { display: flex; justify-content: center; align-items: center; height: 100vh; background: #0d47a1; }
+.login-box { background: white; padding: 40px; border-radius: 16px; width: 420px; text-align: center; box-shadow: 0 12px 40px rgba(0,0,0,0.25); }
+.login-box.logo { font-size: 3.5rem; }
+.login-box h2 { font-size: 1.6rem; color: #0d47a1; margin: 5px 0; font-weight: 700; }
+.login-box h3 { font-size: 1rem; color: #666; margin-bottom: 25px; font-weight: 400; }
+.login-box input,.login-box select { width: 100%; padding: 14px; margin: 10px 0; border-radius: 10px; border: 1.5px solid #ccc; font-size: 1rem; font-family: 'Inter'; }
+.login-box input:focus,.login-box select:focus { border-color: #1976d2; outline: none; }
+.btn { width: 100%; padding: 14px; background: #1976d2; color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 1.1rem; font-family: 'Inter'; transition: 0.2s; }
+.btn:hover { background: #1565c0; }
+.btn-salir { background: #d32f2f; font-size: 0.9rem; padding: 8px 12px; }
 
+        /* JUEGO */
         #game-screen { display: none; height: 100vh; position: relative; }
-        #pasto { position: absolute; bottom: 0; width: 100%; height: 250px; background: #4CAF50; z-index: 1; }
-        #calle { position: absolute; bottom: 90px; width: 100%; height: 150px; background: #555; z-index: 2; }
-        #linea { position: absolute; bottom: 165px; width: 100%; border-top: 8px dashed yellow; z-index: 3; }
-        #escuela { position: absolute; right: 50px; bottom: 220px; font-size: 8em; z-index: 2; }
+        #pasto { position: absolute; bottom: 0; width: 100%; height: 220px; background: #388e3c; z-index: 1; }
+        #calle { position: absolute; bottom: 80px; width: 100%; height: 130px; background: #616161; z-index: 2; }
+        #linea { position: absolute; bottom: 145px; width: 100%; border-top: 6px dashed #ffeb3b; z-index: 3; }
+        #escuela { position: absolute; right: 40px; bottom: 190px; font-size: 5.5em; z-index: 2; }
 
+        /* PERSONA REALISTA TAMAÑO BUENO */
         #personaje {
-            position: absolute; bottom: 100px; left: 40px; z-index: 4; transition: left 0.6s ease-in-out;
-            width: 50px; height: 150px;
+            position: absolute; bottom: 90px; left: 40px; z-index: 4; transition: left 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 4.5em; /* NI GRANDE NI CHIQUITO. BUENO */
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
         }
-.cabeza { width: 50px; height: 50px; background: #fdbcb4; border-radius: 50%; margin: 0 auto; position: relative; border: 3px solid #000; }
-.pelo { width: 54px; height: 25px; background: #3e2723; border-radius: 25px 25px 0 0; position: absolute; top: -3px; left: -2px; }
-.cuerpo { width: 38px; height: 55px; background: #2196F3; margin: 0 auto; border-radius: 8px; border: 3px solid #000; }
-.mochila { width: 30px; height: 42px; background: #e91e63; position: absolute; top: 55px; left: -6px; border-radius: 6px; border: 3px solid #000; }
-.brazo { width: 10px; height: 35px; background: #fdbcb4; position: absolute; top: 55px; border: 2px solid #000; }
-     .brazo.izq { left: -12px; transform-origin: top; animation: moverBrazo 0.6s infinite; }
-     .brazo.der { right: -12px; transform-origin: top; animation: moverBrazo 0.6s infinite reverse; }
-.pierna { width: 12px; height: 40px; background: #1565C0; position: absolute; top: 110px; border: 2px solid #000; }
-     .pierna.izq { left: 6px; transform-origin: top; animation: moverPierna 0.6s infinite; }
-     .pierna.der { right: 6px; transform-origin: top; animation: moverPierna 0.6s infinite reverse; }
-        @keyframes moverBrazo { 0%,100% { transform: rotate(15deg); } 50% { transform: rotate(-15deg); } }
-        @keyframes moverPierna { 0%,100% { transform: rotate(-15deg); } 50% { transform: rotate(15deg); } }
+        #personaje.caminando { animation: caminar 0.7s; }
+        @keyframes caminar {
+            0%,100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
 
+        /* CAJA DE PREGUNTA LIMPIA */
         #caja-pregunta {
-            position: absolute; top: 40px; left: 50%; transform: translateX(-50%);
-            background: white; padding: 35px; border-radius: 20px; width: 90%; max-width: 750px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4); text-align: center; z-index: 10;
+            position: absolute; top: 30px; left: 50%; transform: translateX(-50%);
+            background: white; padding: 30px; border-radius: 16px; width: 90%; max-width: 650px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; z-index: 10;
         }
-        #caja-pregunta h3 { color: #1a5276; margin-top: 0; font-size: 1.5rem; }
-.opcion { display: block; width: 100%; padding: 16px; margin: 12px 0; border: none; border-radius: 12px; background: #ecf0f1; cursor: pointer; font-size: 1.2rem; transition: 0.2s; font-weight: 600; }
-.opcion:hover { background: #3498db; color: white; transform: scale(1.02); }
-        #progreso { margin-top: 15px; font-weight: bold; color: #27ae60; font-size: 1.3rem; }
-        #feedback { font-size: 1.4rem; font-weight: bold; height: 35px; }
-.bien { color: #27ae60; }.mal { color: #e74c3c; }
-.info-jugador { position: absolute; top: 15px; left: 15px; background: white; padding: 15px; border-radius: 10px; z-index: 5; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        #caja-pregunta h3 { color: #0d47a1; margin-top: 0; font-size: 1.3rem; font-weight: 600; }
+.opcion { display: block; width: 100%; padding: 14px; margin: 10px 0; border: 1.5px solid #e0e0e0; border-radius: 10px; background: #fafafa; cursor: pointer; font-size: 1.05rem; transition: 0.2s; font-weight: 600; font-family: 'Inter'; text-align: left; }
+.opcion:hover { background: #e3f2fd; border-color: #1976d2; }
+        #progreso { margin-top: 15px; font-weight: 700; color: #388e3c; font-size: 1.1rem; }
+        #feedback { font-size: 1.2rem; font-weight: 700; height: 32px; }
+.bien { color: #388e3c; }.mal { color: #d32f2f; }
+.info-jugador { position: absolute; top: 15px; left: 15px; background: white; padding: 12px 18px; border-radius: 10px; z-index: 5; font-size: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 600; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
         <div class="login-box">
-            <h2>🏫 Camino a la Escuela</h2>
+            <div class="logo">🎓</div>
+            <h2>Camino a la Escuela</h2>
             <h3>Instituto Rodolfo Reyes Toruño</h3>
-            <p style="font-size: 1.1rem;">Materia: Computación</p>
+            <p style="font-size: 0.95rem; color: #1976d2; font-weight: 600;">Computación: Interfaz y Diagrama de Flujo</p>
             <form id="form-login">
                 <input type="text" id="nombre" placeholder="Nombre Completo" required>
                 <select id="grado" required>
@@ -68,27 +72,20 @@
                     <option>10mo</option><option>11mo</option>
                 </select>
                 <input type="text" id="seccion" placeholder="Sección: A, B, C" required>
-                <button type="submit" class="btn">▶ EMPEZAR</button>
+                <button type="submit" class="btn">Iniciar Juego</button>
             </form>
         </div>
     </div>
 
     <div id="game-screen">
         <div class="info-jugador">
-            <b id="jugador-nombre"></b> | <span id="jugador-grado"></span>
+            <b id="jugador-nombre"></b> - <span id="jugador-grado"></span>
             <button class="btn-salir" onclick="salir()">Salir</button>
         </div>
 
         <div id="escuela">🏫</div>
-        <div id="personaje">
-            <div class="cabeza"><div class="pelo"></div></div>
-            <div class="cuerpo"></div>
-            <div class="mochila"></div>
-            <div class="brazo izq"></div>
-            <div class="brazo der"></div>
-            <div class="pierna izq"></div>
-            <div class="pierna der"></div>
-        </div>
+        <!-- PERSONA REALISTA -->
+        <div id="personaje">🚶‍♂️</div>
         <div id="linea"></div>
         <div id="calle"></div>
         <div id="pasto"></div>
@@ -104,16 +101,16 @@
     <script>
         let estudiante = {};
         let bancoPreguntas = [
-            {q: "¿Qué es la interfaz de un software de programación?", ops: ["El código fuente", "La parte visual con botones y menús", "El compilador", "Una variable"], res: 1},
-            {q: "¿Cuál es una herramienta del software de programación?", ops: ["Editor de código", "Monitor", "Teclado", "Mouse"], res: 0},
-            {q: "¿Para qué sirve un sistema de programación?", ops: ["Para jugar", "Para crear y ejecutar programas", "Para navegar", "Para dibujar"], res: 1},
-            {q: "¿Qué representa un óvalo en un diagrama de flujo de datos?", ops: ["Proceso", "Inicio/Fin", "Decisión", "Datos"], res: 1},
-            {q: "¿Qué es un compilador?", ops: ["Una herramienta que traduce código a lenguaje máquina", "Una impresora", "Un antivirus", "Un navegador"], res: 0},
-            {q: "En un diagrama de flujo, ¿qué figura es un rombo?", ops: ["Proceso", "Entrada/Salida", "Decisión", "Conector"], res: 2},
-            {q: "¿Qué herramienta sirve para depurar errores en el código?", ops: ["Debugger", "Paint", "Word", "Excel"], res: 0},
-            {q: "¿Qué son los datos en un diagrama de flujo de datos?", ops: ["Las flechas", "La información que entra y sale", "Los procesos", "El inicio"], res: 1},
-            {q: "¿Cuál NO es parte de la interfaz de un IDE?", ops: ["Barra de herramientas", "Consola", "CPU", "Área de código"], res: 2},
-            {q: "¿Qué hace un depurador?", ops: ["Escribe código solo", "Encuentra y corrige errores", "Crea gráficos", "Diseña páginas web"], res: 1},
+            {q: "¿Qué es la interfaz de un software de programación?", ops: ["A. El código fuente", "B. La parte visual con botones y menús", "C. El compilador", "D. Una variable"], res: 1},
+            {q: "¿Cuál es una herramienta del software de programación?", ops: ["A. Editor de código", "B. Monitor", "C. Teclado", "D. Mouse"], res: 0},
+            {q: "¿Para qué sirve un sistema de programación?", ops: ["A. Para jugar", "B. Para crear y ejecutar programas", "C. Para navegar", "D. Para dibujar"], res: 1},
+            {q: "¿Qué representa un óvalo en un diagrama de flujo de datos?", ops: ["A. Proceso", "B. Inicio/Fin", "C. Decisión", "D. Datos"], res: 1},
+            {q: "¿Qué es un compilador?", ops: ["A. Una herramienta que traduce código a lenguaje máquina", "B. Una impresora", "C. Un antivirus", "D. Un navegador"], res: 0},
+            {q: "En un diagrama de flujo, ¿qué figura es un rombo?", ops: ["A. Proceso", "B. Entrada/Salida", "C. Decisión", "D. Conector"], res: 2},
+            {q: "¿Qué herramienta sirve para depurar errores en el código?", ops: ["A. Debugger", "B. Paint", "C. Word", "D. Excel"], res: 0},
+            {q: "¿Qué son los datos en un diagrama de flujo de datos?", ops: ["A. Las flechas", "B. La información que entra y sale", "C. Los procesos", "D. El inicio"], res: 1},
+            {q: "¿Cuál NO es parte de la interfaz de un IDE?", ops: ["A. Barra de herramientas", "B. Consola", "C. CPU", "D. Área de código"], res: 2},
+            {q: "¿Qué hace un depurador?", ops: ["A. Escribe código solo", "B. Encuentra y corrige errores", "C. Crea gráficos", "D. Diseña páginas web"], res: 1},
         ];
         let preguntasUsadas = []; let preguntaActual = 0; let fallos = 0; let pasos = 0; let anchoPantalla; let bloqueado = false;
 
@@ -130,10 +127,10 @@
 
         function entrarAlJuego() {
             document.getElementById('jugador-nombre').innerText = estudiante.nombre;
-            document.getElementById('jugador-grado').innerText = estudiante.grado + " " + estudiante.seccion; // AQUI ESTABA EL ERROR
+            document.getElementById('jugador-grado').innerText = estudiante.grado + " + estudiante.seccion;
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('game-screen').style.display = 'block';
-            anchoPantalla = window.innerWidth - 250;
+            anchoPantalla = window.innerWidth - 280;
             reiniciarPartida();
         }
 
@@ -160,12 +157,15 @@
         }
 
         function responder(correcta) {
-            if(bloqueado) return; bloqueado = true; let feedback = document.getElementById('feedback');
+            if(bloqueado) return; bloqueado = true; let feedback = document.getElementById('feedback'); let personaje = document.getElementById('personaje');
             if(correcta) {
-                feedback.innerHTML = '<span class="bien">✓ Correcto!</span>'; darPaso(); preguntaActual++;
+                feedback.innerHTML = '<span class="bien">✓ Correcto</span>';
+                personaje.classList.add('caminando');
+                setTimeout(() => personaje.classList.remove('caminando'), 700);
+                darPaso(); preguntaActual++;
                 setTimeout(() => { siguientePregunta(); }, 1500);
             } else {
-                fallos++; feedback.innerHTML = '<span class="mal">✖️ Incorrecto! Te quedas aquí.</span>';
+                fallos++; feedback.innerHTML = '<span class="mal">✖ Incorrecto</span>';
                 preguntaActual++; setTimeout(() => { siguientePregunta(); }, 1500);
             }
         }
@@ -179,12 +179,12 @@
             if(fallos > 0) { alert(`Fallaste ${fallos} pregunta(s). Reiniciando desde el comienzo.`); reiniciarPartida(); return; }
             estudiante.completado = true; estudiante.fecha = new Date().toLocaleString(); guardarIntento(estudiante);
             document.getElementById('caja-pregunta').innerHTML = `
-                <h2>¡EXCELENTE ${estudiante.nombre}! 🎉</h2>
-                <p style="font-size: 1.2rem;">Respondiste las 10 bien. El niño llegó a la escuela 👦🏫</p>
+                <h2>¡Excelente ${estudiante.nombre}!</h2>
+                <p style="font-size: 1.1rem;">Completaste las 10 preguntas de Computación.<br>El estudiante llegó a la escuela.</p>
                 <button class="btn" onclick="reiniciarPartida()">Jugar de Nuevo</button>`;
         }
 
         function guardarIntento(dato) { let lista = JSON.parse(localStorage.getItem('estudiantesRRT') || '[]'); lista.push(dato); localStorage.setItem('estudiantesRRT', JSON.stringify(lista)); }
     </script>
 </body>
-                    </html>
+</html>
