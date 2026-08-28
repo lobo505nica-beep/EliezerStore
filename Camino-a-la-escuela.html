@@ -14,11 +14,11 @@ body{font-family:Arial;overflow:hidden}
 .btn{width:100%;padding:15px;background:#1976d2;color:#fff;border:none;border-radius:10px;font-weight:bold;font-size:18px;cursor:pointer;margin-top:10px}
 .btn:hover{background:#0d47a1}
 
-#juego{display:none;height:100vh;width:100vw;position:relative;background:linear-gradient(180deg,#87CEEB 0%,#87CEEB 55%,#2E8B57 55%)}
-#escuela{position:absolute;right:3%;bottom:22%;font-size:8vw}
-#personaje{position:absolute;bottom:9%;left:3%;font-size:9vw; /* AQUI LO HICE MAS GRANDE */ transition:left 0.8s ease-in-out;z-index:5;filter:drop-shadow(3px 5px 8px #0003);transform:scaleX(-1)} /* MIRANDO A LA ESCUELA */
-#calle{position:absolute;bottom:10%;width:100%;height:12%;background:#444;z-index:2}
-#linea{position:absolute;bottom:16%;width:100%;border-top:4px dashed yellow;z-index:3}
+#juego{display:none;height:100vh;width:100vw;position:relative;background:linear-gradient(180deg,#87CEEB 0%,#87CEEB 50%,#228B22 50%)}
+#escuela{position:absolute;right:2%;bottom:18%;font-size:12vw; /* ESCUELA MAS GRANDE */ z-index:4}
+#personaje{position:absolute;bottom:14%;left:3%;font-size:11vw; /* PERSONA MAS GRANDE */ transition:left 1s ease-in-out;z-index:5;filter:drop-shadow(4px 6px 10px #0004);transform:scaleX(-1)}
+#calle{position:absolute;bottom:14%;width:100%;height:18%; /* CAMINO MAS ANCHO */ background:#555;z-index:2;box-shadow:inset 0 5px 15px #0005}
+#linea{position:absolute;bottom:23%;width:100%;border-top:6px dashed #FFD700;z-index:3} /* LINEA MAS GRUESA */
 
 #pregunta{position:absolute;top:5%;left:50%;transform:translateX(-50%);background:#fff;padding:30px;border-radius:20px;width:90%;max-width:700px;text-align:center;box-shadow:0 8px 30px #0004;z-index:10}
 #pregunta h3{font-size:22px;color:#0d47a1;margin-bottom:20px}
@@ -94,11 +94,13 @@ function entrar(){
 function siguientePregunta(){
   if(numPregunta>=10){
     if(fallos>0){
-      alert("Fallaste "+fallos+" pregunta(s). Reiniciando.");
+      alert("Fallaste "+fallos+" pregunta(s). Reiniciando desde el inicio.");
       numPregunta=0;fallos=0;pasos=0;usadas=[];
       document.getElementById('personaje').style.left='3%';
     }else{
-      document.getElementById('pregunta').innerHTML="<h2>¡FELICIDADES "+estudiante.nombre+"! 🎉</h2><p>Llegaste a la escuela</p><button class='btn' onclick='location.reload()'>Jugar de Nuevo</button>";
+      // ANIMACION DE ENTRAR A LA ESCUELA
+      document.getElementById('personaje').style.left='85%';
+      document.getElementById('pregunta').innerHTML="<h2>¡FELICIDADES "+estudiante.nombre+"! 🎉</h2><p style='font-size:20px'>Entraste a la escuela. Respondiste las 10 bien.</p><button class='btn' onclick='location.reload()'>Jugar de Nuevo</button>";
       return;
     }
   }
@@ -122,11 +124,11 @@ function responder(esCorrecta){
   if(esCorrecta){
     document.getElementById('feedback').innerHTML="<span class='bien'>✓ CORRECTO</span>";
     pasos++;
-    document.getElementById('personaje').style.left=(3+((90-9)/10)*pasos)+"%"; /* AJUSTADO AL NUEVO TAMAÑO */
-    numPregunta++;setTimeout(siguientePregunta,1800);
+    document.getElementById('personaje').style.left=(3+((82-11)/10)*pasos)+"%"; /* CAMINA REAL POR EL CAMINO */
+    numPregunta++;setTimeout(siguientePregunta,1500);
   }else{
     document.getElementById('feedback').innerHTML="<span class='mal'>✖ INCORRECTO</span>";
-    fallos++;numPregunta++;setTimeout(siguientePregunta,1800);
+    fallos++;numPregunta++;setTimeout(siguientePregunta,1500);
   }
 }
 </script>
