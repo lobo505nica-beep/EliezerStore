@@ -15,10 +15,10 @@ body{font-family:Arial;overflow:hidden}
 .btn:hover{background:#0d47a1}
 
 #juego{display:none;height:100vh;width:100vw;position:relative;background:linear-gradient(180deg,#87CEEB 0%,#87CEEB 50%,#228B22 50%)}
-#escuela{position:absolute;right:2%;bottom:18%;font-size:12vw; /* ESCUELA MAS GRANDE */ z-index:4}
-#personaje{position:absolute;bottom:14%;left:3%;font-size:11vw; /* PERSONA MAS GRANDE */ transition:left 1s ease-in-out;z-index:5;filter:drop-shadow(4px 6px 10px #0004);transform:scaleX(-1)}
-#calle{position:absolute;bottom:14%;width:100%;height:18%; /* CAMINO MAS ANCHO */ background:#555;z-index:2;box-shadow:inset 0 5px 15px #0005}
-#linea{position:absolute;bottom:23%;width:100%;border-top:6px dashed #FFD700;z-index:3} /* LINEA MAS GRUESA */
+#escuela{position:absolute;right:2%;bottom:18%;font-size:12vw;z-index:4}
+#personaje{position:absolute;bottom:14%;left:3%;font-size:11vw;transition:left 1s ease-in-out;z-index:5;filter:drop-shadow(4px 6px 10px #0004);transform:scaleX(-1)}
+#calle{position:absolute;bottom:14%;width:100%;height:18%;background:#555;z-index:2;box-shadow:inset 0 5px 15px #0005}
+#linea{position:absolute;bottom:23%;width:100%;border-top:6px dashed #FFD700;z-index:3}
 
 #pregunta{position:absolute;top:5%;left:50%;transform:translateX(-50%);background:#fff;padding:30px;border-radius:20px;width:90%;max-width:700px;text-align:center;box-shadow:0 8px 30px #0004;z-index:10}
 #pregunta h3{font-size:22px;color:#0d47a1;margin-bottom:20px}
@@ -49,12 +49,10 @@ body{font-family:Arial;overflow:hidden}
 
 <div id="juego">
   <div class="info"><span id="n"></span> - <span id="g"></span> <button onclick="location.reload()" style="margin-left:15px;padding:5px 10px">Salir</button></div>
-
   <div id="escuela">🏫</div>
   <div id="personaje">🚶‍♂️</div>
   <div id="linea"></div>
   <div id="calle"></div>
-
   <div id="pregunta">
     <h3 id="texto">Cargando...</h3>
     <div id="feedback"></div>
@@ -63,7 +61,23 @@ body{font-family:Arial;overflow:hidden}
   </div>
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCzu4rNjwLLQwt5BW9UxWvbMtD6JjR4Fa4",
+  authDomain: "camino-a-la-escuela.firebaseapp.com",
+  databaseURL: "https://camino-a-la-escuela-default-rtdb.firebaseio.com",
+  projectId: "camino-a-la-escuela",
+  storageBucket: "camino-a-la-escuela.firebasestorage.app",
+  messagingSenderId: "113022794275",
+  appId: "1:113022794275:web:c155955d9c61180f588f96"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
 let estudiante={}, numPregunta=0, fallos=0, pasos=0, usadas=[], bloqueado=false;
 let banco=[
 {q:"¿Qué es la interfaz de un software de programación?",ops:["A. El código fuente","B. La parte visual con botones y menús","C. El compilador","D. Una variable"],r:1},
@@ -78,7 +92,7 @@ let banco=[
 {q:"¿Qué hace un depurador?",ops:["A. Escribe código solo","B. Encuentra y corrige errores","C. Crea gráficos","D. Diseña páginas web"],r:1}
 ];
 
-function entrar(){
+window.entrar = function(){
   let nom=document.getElementById('nombre').value;
   let gra=document.getElementById('grado').value;
   let sec=document.getElementById('seccion').value;
@@ -94,13 +108,15 @@ function entrar(){
 function siguientePregunta(){
   if(numPregunta>=10){
     if(fallos>0){
-      alert("Fallaste "+fallos+" pregunta(s). Reiniciando desde el inicio.");
+      let nota = 100 - (fallos * 10);
+      guardarNota(nota);
+      alert("Fallaste "+fallos+" pregunta(s). Tu nota: "+nota+". Reiniciando.");
       numPregunta=0;fallos=0;pasos=0;usadas=[];
       document.getElementById('personaje').style.left='3%';
     }else{
-      // ANIMACION DE ENTRAR A LA ESCUELA
+      guardarNota(100);
       document.getElementById('personaje').style.left='85%';
-      document.getElementById('pregunta').innerHTML="<h2>¡FELICIDADES "+estudiante.nombre+"! 🎉</h2><p style='font-size:20px'>Entraste a la escuela. Respondiste las 10 bien.</p><button class='btn' onclick='location.reload()'>Jugar de Nuevo</button>";
+      document.getElementById('pregunta').innerHTML="<h2>¡FELICIDADES "+estudiante.nombre+"! 🎉</h2><p style='font-size:20px'>Entraste a la escuela. Nota: 100/100</p><button class='btn' onclick='location.reload()'>Jugar de Nuevo</button>";
       return;
     }
   }
@@ -117,19 +133,33 @@ function siguientePregunta(){
   });
 }
 
-function responder(esCorrecta){
+window.responder = function(esCorrecta){
   if(bloqueado)return; bloqueado=true;
   document.querySelectorAll('.opcion').forEach(b=>b.disabled=true);
 
   if(esCorrecta){
     document.getElementById('feedback').innerHTML="<span class='bien'>✓ CORRECTO</span>";
     pasos++;
-    document.getElementById('personaje').style.left=(3+((82-11)/10)*pasos)+"%"; /* CAMINA REAL POR EL CAMINO */
+    document.getElementById('personaje').style.left=(3+((82-11)/10)*pasos)+"%";
     numPregunta++;setTimeout(siguientePregunta,1500);
   }else{
     document.getElementById('feedback').innerHTML="<span class='mal'>✖ INCORRECTO</span>";
     fallos++;numPregunta++;setTimeout(siguientePregunta,1500);
   }
+}
+
+function guardarNota(nota){
+  const notasRef = ref(db, 'notas_RRT/');
+  const nuevaNotaRef = push(notasRef);
+  set(nuevaNotaRef, {
+    nombre: estudiante.nombre,
+    grado: estudiante.grado,
+    seccion: estudiante.seccion,
+    nota: nota,
+    aciertos: 10 - fallos,
+    fallos: fallos,
+    fecha: new Date().toLocaleString("es-NI")
+  });
 }
 </script>
 </body>
