@@ -15,10 +15,10 @@ body{font-family:Arial;overflow:hidden}
 .btn:hover{background:#0d47a1}
 
 #juego{display:none;height:100vh;width:100vw;position:relative;background:linear-gradient(180deg,#87CEEB 0%,#87CEEB 50%,#228B22 50%)}
-#escuela{position:absolute;right:2%;bottom:18%;font-size:12vw;z-index:4}
-#personaje{position:absolute;bottom:14%;left:3%;font-size:11vw;transition:left 1s ease-in-out;z-index:5;filter:drop-shadow(4px 6px 10px #0004);transform:scaleX(-1)}
-#calle{position:absolute;bottom:14%;width:100%;height:18%;background:#555;z-index:2;box-shadow:inset 0 5px 15px #0005}
-#linea{position:absolute;bottom:23%;width:100%;border-top:6px dashed #FFD700;z-index:3}
+#escuela{position:absolute;right:2%;bottom:18%;font-size:12vw; /* ESCUELA MAS GRANDE */ z-index:4}
+#personaje{position:absolute;bottom:14%;left:3%;font-size:11vw; /* PERSONA MAS GRANDE */ transition:left 1s ease-in-out;z-index:5;filter:drop-shadow(4px 6px 10px #0004);transform:scaleX(-1)}
+#calle{position:absolute;bottom:14%;width:100%;height:18%; /* CAMINO MAS ANCHO */ background:#555;z-index:2;box-shadow:inset 0 5px 15px #0005}
+#linea{position:absolute;bottom:23%;width:100%;border-top:6px dashed #FFD700;z-index:3} /* LINEA MAS GRUESA */
 
 #pregunta{position:absolute;top:5%;left:50%;transform:translateX(-50%);background:#fff;padding:30px;border-radius:20px;width:90%;max-width:700px;text-align:center;box-shadow:0 8px 30px #0004;z-index:10}
 #pregunta h3{font-size:22px;color:#0d47a1;margin-bottom:20px}
@@ -49,10 +49,12 @@ body{font-family:Arial;overflow:hidden}
 
 <div id="juego">
   <div class="info"><span id="n"></span> - <span id="g"></span> <button onclick="location.reload()" style="margin-left:15px;padding:5px 10px">Salir</button></div>
+
   <div id="escuela">🏫</div>
   <div id="personaje">🚶‍♂️</div>
   <div id="linea"></div>
   <div id="calle"></div>
+
   <div id="pregunta">
     <h3 id="texto">Cargando...</h3>
     <div id="feedback"></div>
@@ -61,27 +63,9 @@ body{font-family:Arial;overflow:hidden}
   </div>
 </div>
 
-<script type="module">
-// FIREBASE
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "TU_AUTH_DOMAIN",
-  databaseURL: "TU_DATABASE_URL",
-  projectId: "TU_PROJECT_ID",
-  storageBucket: "TU_STORAGE_BUCKET",
-  messagingSenderId: "TU_SENDER_ID",
-  appId: "TU_APP_ID"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
+<script>
 let estudiante={}, numPregunta=0, fallos=0, pasos=0, usadas=[], bloqueado=false;
 let banco=[
-// 1-10 BASE
 {q:"¿Qué es la interfaz de un software de programación?",ops:["A. El código fuente","B. La parte visual con botones y menús","C. El compilador","D. Una variable"],r:1},
 {q:"¿Cuál es una herramienta del software de programación?",ops:["A. Editor de código","B. Monitor","C. Teclado","D. Mouse"],r:0},
 {q:"¿Para qué sirve un sistema de programación?",ops:["A. Para jugar","B. Para crear y ejecutar programas","C. Para navegar","D. Para dibujar"],r:1},
@@ -91,42 +75,8 @@ let banco=[
 {q:"¿Qué herramienta sirve para depurar errores?",ops:["A. Debugger","B. Paint","C. Word","D. Excel"],r:0},
 {q:"¿Qué son los datos en un diagrama de flujo?",ops:["A. Las flechas","B. La información que entra y sale","C. Los procesos","D. El inicio"],r:1},
 {q:"¿Cuál NO es parte de la interfaz de un IDE?",ops:["A. Barra de herramientas","B. Consola","C. CPU","D. Área de código"],r:2},
-{q:"¿Qué hace un depurador?",ops:["A. Escribe código solo","B. Encuentra y corrige errores","C. Crea gráficos","D. Diseña páginas web"],r:1},
-
-// 11-20 BASE DATOS Y PSEUDOCODIGO
-{q:"¿Qué es una base de datos?",ops:["A. Conjunto organizado de datos","B. Un programa","C. Una interfaz","D. Un algoritmo"],r:0},
-{q:"¿Qué es clave primaria?",ops:["A. Identifica de forma única cada registro","B. Cualquier campo","C. Un dato repetido","D. Una consulta"],r:0},
-{q:"¿Qué hace SELECT en SQL?",ops:["A. Consultar datos","B. Borrar datos","C. Crear tabla","D. Actualizar"],r:0},
-{q:"¿Qué es pseudocódigo?",ops:["A. Descripción de algoritmo en lenguaje simple","B. Código real","C. Diagrama","D. Base de datos"],r:0},
-{q:"¿Cómo se escribe 'si' en pseudocódigo?",ops:["A. Si... Entonces","B. If... Then","C. Cuando","D. Mientras"],r:0},
-{q:"¿Qué representa un rectángulo en diagrama de flujo?",ops:["A. Proceso","B. Inicio","C. Decisión","D. Datos"],r:0},
-{q:"¿Qué representa un rombo en diagrama de flujo?",ops:["A. Decisión","B. Proceso","C. Inicio","D. Fin"],r:0},
-{q:"¿Qué es un algoritmo?",ops:["A. Conjunto de pasos para resolver un problema","B. Un programa","C. Una variable","D. Una base de datos"],r:0},
-{q:"¿Qué es normalización?",ops:["A. Organizar datos para evitar redundancia","B. Desorganizar","C. Borrar","D. Copiar"],r:0},
-{q:"¿Qué hace INSERT en SQL?",ops:["A. Insertar datos nuevos","B. Consultar","C. Borrar","D. Modificar"],r:0},
-
-// 21-30 PYTHON Y SCRATCH
-{q:"¿Qué es Python?",ops:["A. Lenguaje de programación de alto nivel","B. Base de datos","C. Sistema operativo","D. Navegador"],r:0},
-{q:"¿Cómo se imprime en Python?",ops:["A. print('Hola')","B. echo 'Hola'","C. write('Hola')","D. show('Hola')"],r:0},
-{q:"¿Qué es Scratch?",ops:["A. Lenguaje de programación por bloques","B. Base de datos","C. Editor de texto","D. Compilador"],r:0},
-{q:"¿Para qué sirve Scratch?",ops:["A. Enseñar programación a niños","B. Crear bases de datos","C. Diseñar web","D. Compilar"],r:0},
-{q:"¿Qué es una variable?",ops:["A. Espacio en memoria que guarda un dato","B. Un tipo de ciclo","C. Una función","D. Un error"],r:0},
-{q:"¿Qué es un ciclo 'for'?",ops:["A. Repite código un número de veces","B. Toma decisiones","C. Crea variables","D. Muestra un mensaje"],r:0},
-{q:"¿Qué es una función?",ops:["A. Bloque de código reutilizable","B. Una variable","C. Un ciclo","D. Un error"],r:0},
-{q:"¿Qué es interfaz física?",ops:["A. Conexión entre usuario y hardware","B. Código","C. Base de datos","D. Algoritmo"],r:0},
-{q:"¿Qué es API?",ops:["A. Interfaz de Programación de Aplicaciones","B. Archivo","C. Programa","D. Base de datos"],r:0},
-{q:"¿Qué es un bug?",ops:["A. Error en el código","B. Una función","C. Una variable","D. Un comentario"],r:0}
+{q:"¿Qué hace un depurador?",ops:["A. Escribe código solo","B. Encuentra y corrige errores","C. Crea gráficos","D. Diseña páginas web"],r:1}
 ];
-
-function mezclarArray(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
-
-let preguntasDelJuego = [];
 
 function entrar(){
   let nom=document.getElementById('nombre').value;
@@ -138,28 +88,25 @@ function entrar(){
   document.getElementById('g').innerText=estudiante.grado+" "+estudiante.seccion;
   document.getElementById('login').style.display='none';
   document.getElementById('juego').style.display='block';
-  preguntasDelJuego = mezclarArray([...banco]).slice(0, 10); // Toma 10 aleatorias de 30
   siguientePregunta();
 }
 
 function siguientePregunta(){
   if(numPregunta>=10){
     if(fallos>0){
-      let nota = 100 - (fallos * 10);
-      guardarNota(nota);
-      alert("Fallaste "+fallos+" pregunta(s). Tu nota: "+nota+". Reiniciando.");
-      numPregunta=0;fallos=0;pasos=0;
+      alert("Fallaste "+fallos+" pregunta(s). Reiniciando desde el inicio.");
+      numPregunta=0;fallos=0;pasos=0;usadas=[];
       document.getElementById('personaje').style.left='3%';
-      preguntasDelJuego = mezclarArray([...banco]).slice(0, 10);
     }else{
-      guardarNota(100);
+      // ANIMACION DE ENTRAR A LA ESCUELA
       document.getElementById('personaje').style.left='85%';
-      document.getElementById('pregunta').innerHTML="<h2>¡FELICIDADES "+estudiante.nombre+"! 🎉</h2><p style='font-size:20px'>Entraste a la escuela. Nota: 100/100</p><button class='btn' onclick='location.reload()'>Jugar de Nuevo</button>";
+      document.getElementById('pregunta').innerHTML="<h2>¡FELICIDADES "+estudiante.nombre+"! 🎉</h2><p style='font-size:20px'>Entraste a la escuela. Respondiste las 10 bien.</p><button class='btn' onclick='location.reload()'>Jugar de Nuevo</button>";
       return;
     }
   }
   bloqueado=false;document.getElementById('feedback').innerHTML="";
-  let preg=preguntasDelJuego[numPregunta];
+  let i;do{i=Math.floor(Math.random()*banco.length)}while(usadas.includes(i));usadas.push(i);
+  let preg=banco[i];
   document.getElementById('texto').innerText=preg.q;
   document.getElementById('prog').innerText="Pregunta "+(numPregunta+1)+" de 10";
   let cont=document.getElementById('ops');cont.innerHTML="";
@@ -177,26 +124,12 @@ function responder(esCorrecta){
   if(esCorrecta){
     document.getElementById('feedback').innerHTML="<span class='bien'>✓ CORRECTO</span>";
     pasos++;
-    document.getElementById('personaje').style.left=(3+((82-11)/10)*pasos)+"%";
+    document.getElementById('personaje').style.left=(3+((82-11)/10)*pasos)+"%"; /* CAMINA REAL POR EL CAMINO */
     numPregunta++;setTimeout(siguientePregunta,1500);
   }else{
     document.getElementById('feedback').innerHTML="<span class='mal'>✖ INCORRECTO</span>";
     fallos++;numPregunta++;setTimeout(siguientePregunta,1500);
   }
-}
-
-function guardarNota(nota){
-  const notasRef = ref(db, 'notas_RRT/');
-  const nuevaNotaRef = push(notasRef);
-  set(nuevaNotaRef, {
-    nombre: estudiante.nombre,
-    grado: estudiante.grado,
-    seccion: estudiante.seccion,
-    nota: nota,
-    aciertos: 10 - fallos,
-    fallos: fallos,
-    fecha: new Date().toLocaleString("es-NI")
-  });
 }
 </script>
 </body>
