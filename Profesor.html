@@ -1,1 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Notas RRT - Profesor</title>
+<style>
+body{font-family:Arial;background:#f0f2f5;padding:20px}
+h1{color:#0d47a1;text-align:center}
+table{width:100%;background:#fff;border-collapse:collapse;border-radius:10px;overflow:hidden;box-shadow:0 5px 20px #0002}
+th{background:#1976d2;color:#fff;padding:15px;text-align:left}
+td{padding:12px;border-bottom:1px solid #eee}
+tr:hover{background:#e3f2fd}
+.bien{color:#2E8B57;font-weight:bold}
+.mal{color:#d32f2f;font-weight:bold}
+</style>
+</head>
+<body>
+<h1>📊 Notas - Instituto Rodolfo Reyes Toruño</h1>
+<table>
+  <thead>
+    <tr>
+      <th>Nombre</th><th>Grado</th><th>Sección</th><th>Nota</th><th>Aciertos</th><th>Fallos</th><th>Fecha</th>
+    </tr>
+  </thead>
+  <tbody id="tabla-notas"><tr><td colspan="7">Cargando notas...</td></tr></tbody>
+</table>
 
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCzu4rNjwLLQwt5BW9UxWvbMtD6JjR4Fa4",
+  authDomain: "camino-a-la-escuela.firebaseapp.com",
+  databaseURL: "https://camino-a-la-escuela-default-rtdb.firebaseio.com",
+  projectId: "camino-a-la-escuela",
+  storageBucket: "camino-a-la-escuela.firebasestorage.app",
+  messagingSenderId: "113022794275",
+  appId: "1:113022794275:web:c155955d9c61180f588f96"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const notasRef = ref(db, 'notas_RRT/');
+
+onValue(notasRef, (snapshot) => {
+  const tbody = document.getElementById('tabla-notas');
+  tbody.innerHTML = "";
+  snapshot.forEach((childSnapshot) => {
+    const nota = childSnapshot.val();
+    let claseNota = nota.nota >= 70? 'bien' : 'mal';
+    tbody.innerHTML += `
+      <tr>
+        <td>${nota.nombre}</td><td>${nota.grado}</td><td>${nota.seccion}</td>
+        <td class="${claseNota}">${nota.nota}</td><td>${nota.aciertos}</td>
+        <td>${nota.fallos}</td><td>${nota.fecha}</td>
+      </tr>
+    `;
+  });
+});
+</script>
+</body>
+</html>
