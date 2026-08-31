@@ -64,7 +64,7 @@ body{font-family:'Arial';overflow:hidden;background:#000}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, push, set, get, child, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getDatabase, ref, push, set, get, child, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCzu4rNjwLLQwt5BW9UxWvbMtD6JjR4Fa4",
@@ -79,7 +79,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-let estudiante={}, idAlumno="", numPregunta=0, fallos=0, pasos=0, usadas=[], bloqueado=false;
+let estudiante={}, idAlumno="", numPregunta=0, fallos=0, pasos=0, usadas=[], bloqueado=false, verificador=null;
 
 let banco=[
 {q:"¿Qué es la interfaz de un software de programación?",ops:["A. El código fuente","B. La parte visual con botones y menús","C. El compilador","D. Una variable"],r:1},
@@ -111,14 +111,13 @@ window.entrar = async function(){
   if(nom==""||gra==""||sec==""){alert("Completa todos los campos");return;}
 
   estudiante={nombre:nom,grado:gra,seccion:sec};
-  idAlumno = nom.replace(/ /g,"_")+"_"+gra+"_"+sec; // ID único
+  idAlumno = nom.replace(/ /g,"_")+"_"+gra+"_"+sec;
 
-  // GUARDAR ALUMNO EN FIREBASE SI NO EXISTE
   const alumnoRef = ref(db, 'alumnos_RRT/'+idAlumno);
   const snap = await get(alumnoRef);
   if(!snap.exists()){
     await set(alumnoRef, {
-     ...estudiante,
+    ...estudiante,
       vecesJugadas: 0,
       vecesGanadas: 0,
       vecesPerdidas: 0,
@@ -135,10 +134,27 @@ function iniciarJuego(){
   document.getElementById('g').innerText=estudiante.grado+" "+estudiante.seccion;
   document.getElementById('login').style.display='none';
   document.getElementById('juego').style.display='block';
+
+  // VERIFICAR CADA 2 SEGUNDOS SI EL PROFE BORRO LA CUENTA
+  verificador = setInterval(verificarCuenta, 2000);
+
   siguientePregunta();
 }
 
+function verificarCuenta(){
+  const alumnoRef = ref(db, 'alumnos_RRT/'+idAlumno);
+  onValue(alumnoRef, (snap) => {
+    if(!snap.exists()){
+      clearInterval(verificador);
+      alert("Tu cuenta fue eliminada por el profesor. Serás expulsado al login.");
+      localStorage.removeItem('alumnoRRT');
+      location.reload();
+    }
+  }, {onlyOnce: true});
+}
+
 window.cerrarSesion = function(){
+  clearInterval(verificador);
   localStorage.removeItem('alumnoRRT');
   location.reload();
 }
@@ -181,7 +197,6 @@ async function terminarJuego(){
   let nota = gano? 100 : 100 - (fallos * 10);
   if(nota<0) nota=0;
 
-  // ACTUALIZAR ESTADISTICAS DEL ALUMNO
   const alumnoRef = ref(db, 'alumnos_RRT/'+idAlumno);
   const snap = await get(alumnoRef);
   let data = snap.val();
@@ -193,11 +208,10 @@ async function terminarJuego(){
   };
   await update(alumnoRef, nuevasStats);
 
-  // GUARDAR PARTIDA INDIVIDUAL
   const partidaRef = push(ref(db, 'partidas_RRT/'));
   await set(partidaRef, {
     idAlumno: idAlumno,
-   ...estudiante,
+  ...estudiante,
     nota: nota,
     gano: gano,
     fallos: fallos,
