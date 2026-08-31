@@ -7,27 +7,24 @@
 <style>
 body{font-family:Arial;background:#f0f4f8;margin:0;padding:20px}
 h1{text-align:center;color:#0d47a1}
-.contenedor{max-width:1000px;margin:20px auto;background:#fff;padding:30px;border-radius:15px;box-shadow:0 5px 20px #0002}
+.contenedor{max-width:1200px;margin:20px auto;background:#fff;padding:30px;border-radius:15px;box-shadow:0 5px 20px #0002}
 table{width:100%;border-collapse:collapse;margin-top:20px}
 th,td{padding:12px;border:1px solid #ddd;text-align:center}
 th{background:#1976d2;color:#fff}
 tr:nth-child(even){background:#f5f5f5}
-.nota100{color:#2E8B57;font-weight:bold}
-.notaMal{color:#d32f2f;font-weight:bold}
-#loading{text-align:center;padding:40px;font-size:18px}
+.ganadas{color:#2E8B57;font-weight:bold}
+.perdidas{color:#d32f2f;font-weight:bold}
 .btn{padding:10px 20px;background:#1976d2;color:#fff;border:none;border-radius:8px;cursor:pointer;margin:5px}
-.btn:hover{background:#0d47a1}
 </style>
 </head>
 <body>
 
 <h1>🎓 Panel del Profesor - Instituto RRT</h1>
 <div class="contenedor">
-  <h2>Notas del Juego "Camino a la Escuela"</h2>
-  <button class="btn" onclick="borrarNotas()">🗑️ Borrar Todas las Notas</button>
+  <h2>Estadísticas de Alumnos</h2>
   <button class="btn" onclick="location.reload()">🔄 Actualizar</button>
 
-  <div id="loading">Cargando notas...</div>
+  <div id="loading">Cargando alumnos...</div>
 
   <table id="tabla" style="display:none">
     <thead>
@@ -36,10 +33,11 @@ tr:nth-child(even){background:#f5f5f5}
         <th>Nombre</th>
         <th>Grado</th>
         <th>Sección</th>
-        <th>Aciertos</th>
-        <th>Fallos</th>
-        <th>Nota</th>
-        <th>Fecha</th>
+        <th>Veces Jugadas</th>
+        <th class="ganadas">Ganadas</th>
+        <th class="perdidas">Perdidas</th>
+        <th>Última Nota</th>
+        <th>Fecha Registro</th>
       </tr>
     </thead>
     <tbody id="cuerpoTabla">
@@ -49,7 +47,7 @@ tr:nth-child(even){background:#f5f5f5}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCzu4rNjwLLQwt5BW9UxWvbMtD6JjR4Fa4",
@@ -64,9 +62,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// LEER NOTAS EN TIEMPO REAL
-const notasRef = ref(db, 'notas_RRT/');
-onValue(notasRef, (snapshot) => {
+const alumnosRef = ref(db, 'alumnos_RRT/');
+onValue(alumnosRef, (snapshot) => {
   const data = snapshot.val();
   const tbody = document.getElementById('cuerpoTabla');
   tbody.innerHTML = "";
@@ -77,32 +74,26 @@ onValue(notasRef, (snapshot) => {
 
     let contador = 1;
     Object.keys(data).forEach(key => {
-      let n = data[key];
+      let a = data[key];
       let tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${contador}</td>
-        <td>${n.nombre}</td>
-        <td>${n.grado}</td>
-        <td>${n.seccion}</td>
-        <td>${n.aciertos}/10</td>
-        <td>${n.fallos}</td>
-        <td class="${n.nota==100? 'nota100' : 'notaMal'}">${n.nota}</td>
-        <td>${n.fecha}</td>
+        <td>${a.nombre}</td>
+        <td>${a.grado}</td>
+        <td>${a.seccion}</td>
+        <td>${a.vecesJugadas}</td>
+        <td class="ganadas">${a.vecesGanadas}</td>
+        <td class="perdidas">${a.vecesPerdidas}</td>
+        <td>${a.ultimaNota || '-'}</td>
+        <td>${a.fechaRegistro}</td>
       `;
       tbody.appendChild(tr);
       contador++;
     });
   } else {
-    document.getElementById('loading').innerText = "⚠️ Aún no hay notas. Que los alumnos jueguen primero.";
+    document.getElementById('loading').innerText = "⚠️ Aún no hay alumnos registrados.";
   }
 });
-
-window.borrarNotas = function(){
-  if(confirm("¿Seguro que quieres borrar todas las notas?")){
-    remove(notasRef);
-    alert("Notas borradas");
-  }
-}
 </script>
 </body>
 </html>
