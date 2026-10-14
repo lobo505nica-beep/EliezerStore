@@ -58,10 +58,9 @@ nav.activo{right:0} nav a{color:#fff;text-decoration:none;font-weight:700;font-s
 <section class="seccion" id="seccion-productos"><div class="container"><h2 class="section-title">CATÁLOGO</h2><div class="productos-grid" id="lista-productos"></div></div></section>
 <section class="seccion" id="seccion-nosotros"><div class="container"><h2 class="section-title">SOBRE NOSOTROS</h2><div class="info-box"><h3>🚀 ¿Quiénes somos?</h3><p>Somos <b>Eliezer Store</b>, 100% nicaragüense.</p></div><div class="info-box"><h3>💯 Misión</h3><p>Democratizar la tecnología.</p></div><div class="info-box"><h3>⭐ ¿Por qué elegirnos?</h3><ul class="lista-check"><li>Soporte 24/7</li><li>Garantía Total</li><li>Precios de Socio</li><li>100% Seguro</li></ul></div></div></section>
 <section class="seccion" id="seccion-contacto"><div class="container"><h2 class="section-title">CONTÁCTANOS</h2><div class="grid-contacto"><div class="info-box"><h3>📱 WhatsApp</h3><p>+505 8331 8551</p><button class="btn-whatsapp" onclick="window.open('https://wa.me/50583318551','_blank')">ESCRIBIR AHORA</button></div><div class="info-box"><h3>📧 Correo</h3><p>eliezersstore@gmail.com</p></div></div></div></section>
-<div class="modal" id="modal"><div class="modal-content"><span class="cerrar" id="cerrarModal">&times;</span><h2 id="modal-titulo"></h2><div class="pedido-box"><textarea id="texto-pedido" placeholder="Describe tu página..."></textarea><button onclick="enviarPedido()">📤 ENVIAR MI PEDIDO</button></div></div></div>
+<div class="modal" id="modal"><div class="modal-content"><span class="cerrar" id="cerrarModal">&times;</span><h2 id="modal-titulo"></h2><div class="pedido-box"><textarea id="texto-pedido" placeholder="Describe tu página: Colores, secciones, qué quieres que tenga..."></textarea><button onclick="enviarPedido()">📤 ENVIAR MI PEDIDO</button></div></div></div>
 <div class="modal" id="modal-compra"><div class="modal-compra-content"><h2 style="color:#22c55e">¡PAGO REALIZADO!</h2><div style="background:#1e293b;padding:15px;border-radius:10px;margin:15px 0;text-align:left"><p><b>Producto:</b> <span id="compra-producto"></span></p><p><b>Precio:</b> <span id="compra-precio"></span></p><p><b>Tu ID:</b> <span id="compra-id" style="color:#3b82f6"></span></p></div><button class="btn-whatsapp" onclick="enviarWhatsApp()">📱 ENVIAR COMPROBANTE</button><button style="background:#475569;color:white;border:none;padding:12px;border-radius:10px;width:100%;margin-top:10px;cursor:pointer" id="cerrarCompra">CERRAR</button></div></div>
 <script>
-// FUNCIONES DE MENU - VAN PRIMERO PARA QUE NO FALLEN NUNCA
 function mostrarSeccion(id){
     document.querySelectorAll('.seccion').forEach(s=>s.classList.remove('activa'));
     let sec = document.getElementById('seccion-'+id);
@@ -76,14 +75,12 @@ function toggleMenu(){
 }
 function cerrarModal(){document.getElementById('modal').style.display='none'}
 function cerrarModalCompra(){document.getElementById('modal-compra').style.display='none'}
-
 document.addEventListener('DOMContentLoaded', ()=>{
     document.getElementById('btnMenu').addEventListener('click', toggleMenu);
     document.getElementById('navOverlay').addEventListener('click', toggleMenu);
     document.getElementById('cerrarModal').addEventListener('click', cerrarModal);
     document.getElementById('cerrarCompra').addEventListener('click', cerrarModalCompra);
 });
-
 const firebaseConfig = {
   apiKey: "AIzaSyDbJy6E0nDuOQtPgDthl2CZFHNwt2wwMds",
   authDomain: "eliezer-store-95bc1.firebaseapp.com",
@@ -97,7 +94,6 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 let usuarioActual = null, datosUsuario = null, productoActual = null, datosCompra = null;
 const generarID = () => 'ELZ' + Math.floor(100000 + Math.random() * 900000);
-
 function copiarID(){navigator.clipboard.writeText(datosUsuario.idRecarga);alert('ID copiado: '+datosUsuario.idRecarga)}
 function formatearSaldos(user){
     let sDolar = parseFloat(user.saldoDolar?? user.saldo?? 0);
@@ -185,8 +181,9 @@ function cargarProductos(){
             if(!datosUsuario) puede = false;
             let vendedor = p.idVendedor === 'JEFE'? 'TIENDA OFICIAL' : 'SOCIO';
             let textoBoton =!datosUsuario? 'INICIA SESIÓN' : (puede? `COMPRAR ${moneda}${precio}` : 'SIN SALDO '+moneda);
-            let btns = p.categoria==='Página Web'
-? `<button class="btn btn-ver" onclick="abrirPedido('${key}','${p.nombre}')">DESCRIBIR</button><button class="btn btn-comprar" ${!puede?'disabled':''} onclick="comprar('${key}','${p.nombre}',${precio},'${moneda}')">${textoBoton}</button>`
+            let esPaginaWeb = (p.categoria||'').toLowerCase().includes('pagina') || (p.categoria||'').toLowerCase().includes('página') || (p.categoria||'').toLowerCase().includes('web');
+            let btns = esPaginaWeb
+           ? `<button class="btn btn-ver" onclick="abrirPedido('${key}','${p.nombre}')">✍️ DESCRIBIR</button><button class="btn btn-comprar" ${!puede?'disabled':''} onclick="comprar('${key}','${p.nombre}',${precio},'${moneda}')">${textoBoton}</button>`
             : `<button class="btn btn-comprar" style="width:100%" ${!puede?'disabled':''} onclick="comprar('${key}','${p.nombre}',${precio},'${moneda}')">${textoBoton}</button>`;
             cont.innerHTML+=`<div class="card"><span class="badge">${p.categoria}</span> <span class="badge-moneda">${moneda}</span> <span style="font-size:10px;color:#3b82f6"> ${vendedor}</span><h3>${p.nombre}</h3><p>${p.descripcion}</p><p class="precio">${moneda}${precio}</p><div class="btns">${btns}</div></div>`;
         });
@@ -216,4 +213,4 @@ window.comprar=(id,n,pr,mon)=>{
 window.enviarWhatsApp=()=>{window.open(`https://wa.me/50583318551?text=Hola, pague ${datosCompra.producto} por ${datosCompra.moneda}${datosCompra.precio}. Mi ID: ${datosCompra.id}`,'_blank');cerrarModalCompra()}
 </script>
 </body>
-</html>
+    </html>
