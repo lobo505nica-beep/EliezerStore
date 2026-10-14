@@ -96,24 +96,39 @@ function toggleMenu(){
 }
 function cerrarModal(){document.getElementById('modal').style.display='none'}
 function cerrarModalCompra(){document.getElementById('modal-compra').style.display='none'}
-function copiarID(){navigator.clipboard.writeText(datosUsuario.idRecarga);alert('ID copiado')}
+function copiarID(){navigator.clipboard.writeText(datosUsuario.idRecarga);alert('ID copiado: '+datosUsuario.idRecarga)}
 window.onload = () => {
-    const sesion = JSON.parse(localStorage.getItem('elz_sesion'));
-    if(sesion && sesion[0]) cargarUsuario(sesion[0].id);
-    cargarProductos()
+    const sesionGuardada = localStorage.getItem('ELZ_SESION_FIJA');
+    if(sesionGuardada){
+        try{
+            const ses = JSON.parse(sesionGuardada);
+            if(ses && ses.id){
+                cargarUsuario(ses.id, ses.tipo || 'usuarios');
+            }
+        }catch(e){ console.log('sesion corrupta'); }
+    }
+    cargarProductos();
 }
-function cargarUsuario(id){
-    db.ref('usuarios/'+id).on('value', snap=>{
-        if(!snap.exists()) return logout();
+function cargarUsuario(id, tipoBase){
+    let ref = db.ref((tipoBase||'usuarios')+'/'+id);
+    ref.on('value', snap=>{
+        if(!snap.exists()){
+            if(tipoBase==='usuarios'){
+                db.ref('socios/'+id).once('value').then(s2=>{
+                    if(s2.exists()){ cargarUsuario(id, 'socios'); }else{ logoutSilencioso(); }
+                });
+                return;
+            }else{ logoutSilencioso(); return; }
+        }
         let user = snap.val();
-        if(user.baneado){logout();alert('🚫 Tu cuenta ha sido baneada');return}
-        loginUsuario({id:id,...user});
+        if(user.baneado){alert('🚫 Tu cuenta ha sido baneada'); logout(); return;}
+        loginUsuario({id:id, tipo:tipoBase||'usuarios', ...user});
     });
 }
 function loginUsuario(user){
     usuarioActual=user; datosUsuario=user;
     document.getElementById('saldoBar').style.display='flex';
-    document.getElementById('miSaldo').innerText=`$${user.saldo.toFixed(2)}`;
+    document.getElementById('miSaldo').innerText=`$${parseFloat(user.saldo||0).toFixed(2)}`;
     document.getElementById('miID').innerText=user.idRecarga;
     document.getElementById('form-login').style.display='none';
     document.getElementById('datos-usuario-logueado').style.display='block';
@@ -121,40 +136,69 @@ function loginUsuario(user){
     document.getElementById('dato-correo').innerText=user.email;
     document.getElementById('dato-pass').innerText=user.pass;
     document.getElementById('dato-id').innerText=user.idRecarga;
-    document.getElementById('dato-saldo').innerText=`$${user.saldo.toFixed(2)}`;
-    mostrarSeccion('productos');
+    document.getElementById('dato-saldo').innerText=`$${parseFloat(user.saldo||0).toFixed(2)}`;
+    localStorage.setItem('ELZ_SESION_FIJA', JSON.stringify({id:user.id, tipo:user.tipo || 'usuarios'}));
+    mostrarSeccion('login');
     cargarProductos();
 }
 window.handleAuth = () => {
-    const n=document.getElementById('auth-nombre').value, e=document.getElementById('auth-email').value, p=document.getElementById('auth-pass').value;
+    const n=document.getElementById('auth-nombre').value.trim();
+    const e=document.getElementById('auth-email').value.trim().toLowerCase();
+    const p=document.getElementById('auth-pass').value;
     if(!n||!e||!p){document.getElementById('auth-error').innerText="Llena todos los campos";return}
-    db.ref('usuarios').once('value').then(snap=>{
-        let usuarios = snap.val() || {};
-        let id = Object.keys(usuarios).find(k=>usuarios[k].email===e);
-        if(id && usuarios[id].pass===p){
-            if(usuarios[id].baneado){document.getElementById('auth-error').innerText="🚫 Cuenta baneada";return}
-            localStorage.setItem('elz_sesion',JSON.stringify([{id:id}]));cargarUsuario(id)
+    if(p.length < 6){document.getElementById('auth-error').innerText="La contraseña debe tener 6+ caracteres";return}
+    document.getElementById('auth-error').innerText="Buscando...";
+    db.ref('usuarios').once('value').then(snapUsuarios=>{
+        let usuarios = snapUsuarios.val() || {};
+        let idUsuario = Object.keys(usuarios).find(k=> (usuarios[k].email||'').toLowerCase()===e);
+        if(idUsuario){
+            if(usuarios[idUsuario].pass===p){
+                if(usuarios[idUsuario].baneado){document.getElementById('auth-error').innerText="🚫 Cuenta baneada";return}
+                loginUsuario({id:idUsuario, tipo:'usuarios', ...usuarios[idUsuario]});
+                return;
+            }else{ document.getElementById('auth-error').innerText="Contraseña incorrecta"; return; }
         }
-        else if(!id){
+        db.ref('socios').once('value').then(snapSocios=>{
+            let socios = snapSocios.val() || {};
+            let idSocio = Object.keys(socios).find(k=> (socios[k].email||'').toLowerCase()===e);
+            if(idSocio){
+                if(socios[idSocio].pass===p){
+                    if(socios[idSocio].baneado){document.getElementById('auth-error').innerText="🚫 Cuenta baneada";return}
+                    loginUsuario({id:idSocio, tipo:'socios', ...socios[idSocio]});
+                    return;
+                }else{ document.getElementById('auth-error').innerText="Contraseña incorrecta"; return; }
+            }
             let nuevoID = generarID();
             let nuevo = {nombre:n,email:e,pass:p,saldo:0,idRecarga:nuevoID,baneado:false};
             let key = db.ref('usuarios').push().key;
-            db.ref('usuarios/'+key).set(nuevo);
-            localStorage.setItem('elz_sesion',JSON.stringify([{id:key}]));cargarUsuario(key)
-        }
-        else{document.getElementById('auth-error').innerText="Contraseña incorrecta"}
+            db.ref('usuarios/'+key).set(nuevo).then(()=>{ loginUsuario({id:key, tipo:'usuarios', ...nuevo}); document.getElementById('auth-error').innerText=""; });
+        });
     });
 }
-window.logout = () => {localStorage.removeItem('elz_sesion');usuarioActual=null;datosUsuario=null;document.getElementById('saldoBar').style.display='none';document.getElementById('form-login').style.display='block';document.getElementById('datos-usuario-logueado').style.display='none';mostrarSeccion('inicio');cargarProductos()}
+function logoutSilencioso(){
+    usuarioActual=null; datosUsuario=null;
+    document.getElementById('saldoBar').style.display='none';
+    document.getElementById('form-login').style.display='block';
+    document.getElementById('datos-usuario-logueado').style.display='none';
+}
+window.logout = () => {
+    if(!confirm('¿Seguro que quieres cerrar sesión?')) return;
+    localStorage.removeItem('ELZ_SESION_FIJA');
+    localStorage.removeItem('elz_sesion');
+    logoutSilencioso();
+    mostrarSeccion('inicio');
+    cargarProductos();
+}
 function cargarProductos(){
     db.ref('productos').on('value', snap=>{
         let productos = snap.val() || {};
         let cont=document.getElementById('lista-productos'); cont.innerHTML="";
+        if(Object.keys(productos).length===0){ cont.innerHTML="<p style='color:#94a3b8;text-align:center'>No hay productos aún</p>"; return; }
         Object.keys(productos).forEach(key=>{
             let p = productos[key];
             let precio=parseFloat(p.precioPublico) || 0;
             let moneda=p.moneda||'$';
-            let puede=datosUsuario && datosUsuario.saldo>=precio;
+            let puede=datosUsuario && parseFloat(datosUsuario.saldo)>=precio;
             let vendedor = p.idVendedor === 'JEFE'? 'TIENDA OFICIAL' : 'SOCIO';
             let textoBoton =!datosUsuario? 'INICIA SESIÓN' : (puede? `COMPRAR ${moneda}${precio}` : 'SIN SALDO');
             let btns = p.categoria==='Página Web'
@@ -168,16 +212,3 @@ window.abrirPedido=(id,n)=>{if(!datosUsuario)return alert('Inicia sesión primer
 window.enviarPedido=()=>{let t=document.getElementById('texto-pedido').value;if(!t)return alert('Escribe tu pedido');db.ref('pedidos').push({tipo:"Pedido Personalizado",producto:productoActual.n,descripcion:t,cliente:datosUsuario.nombre,idRecarga:datosUsuario.idRecarga,fecha:new Date().toLocaleString(),vendedor:"JEFE"});alert('Pedido enviado!');cerrarModal()}
 window.comprar=(id,n,pr,mon)=>{
     if(!datosUsuario)return alert('Inicia sesión primero');
-    if(datosUsuario.saldo<pr)return alert('Sin saldo. Recarga tu cuenta.');
-    let monedaActual = mon || '$';
-    db.ref('usuarios/'+usuarioActual.id+'/saldo').set(datosUsuario.saldo - pr);
-    db.ref('pedidos').push({tipo:"Pago",producto:n,precio:pr,moneda:monedaActual,cliente:datosUsuario.nombre,idRecarga:datosUsuario.idRecarga,fecha:new Date().toLocaleString(),vendedor:"SOCIO", idVendedor: datosUsuario.idRecarga});
-    datosCompra={producto:n,precio:pr,moneda:monedaActual,id:datosUsuario.idRecarga};
-    document.getElementById('compra-producto').innerText=n;
-    document.getElementById('compra-precio').innerText=monedaActual+pr;
-    document.getElementById('compra-id').innerText=datosUsuario.idRecarga;
-    document.getElementById('modal-compra').style.display='block';
-}
-window.enviarWhatsApp=()=>{window.open(`https://wa.me/50583318551?text=Hola, acabo de pagar ${datosCompra.producto} por ${datosCompra.moneda}${datosCompra.precio}. Mi ID es: ${datosCompra.id}`,'_blank');cerrarModalCompra()}
-</script>
-</body></html>
