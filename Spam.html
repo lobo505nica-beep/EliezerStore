@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Link de Spam</title>
+<style>
+body{background:#0f0f0f;color:white;font-family:Arial;text-align:center;padding:20px}
+h1{color:#25D366}
+input,textarea{width:90%;max-width:400px;padding:12px;margin:8px;border-radius:10px;border:none;outline:none;font-size:16px}
+button{background:#25D366;color:white;border:none;padding:13px 25px;border-radius:10px;font-size:17px;font-weight:bold;cursor:pointer;margin-top:10px}
+#resultado{margin-top:20px;background:#1c1c1c;padding:15px;border-radius:12px;word-break:break-all;display:none}
+#loading{display:none;color:#25D366;font-weight:bold;margin-top:15px}
+</style>
+</head>
+<body>
+
+<h1>Generador de Link de Spam</h1>
+<p>Escribe el número y el mensaje</p>
+
+<input id="numero" type="tel" placeholder="Ej: 50512345678">
+<br>
+<textarea id="mensaje" rows="3" placeholder="Escribe tu mensaje aquí..."></textarea>
+<br>
+<button onclick="generar()">GENERAR LINK</button>
+
+<div id="loading">Generando link... ⏳</div>
+
+<div id="resultado">
+<p id="linkTexto"></p>
+<button onclick="copiar()">COPIAR LINK</button>
+</div>
+
+<script>
+let linkFinal = "";
+function generar(){
+  let num = document.getElementById("numero").value.trim();
+  let msg = document.getElementById("mensaje").value.trim();
+  if(!num){ alert("Pon el número bro"); return; }
+  document.getElementById("loading").style.display = "block";
+  document.getElementById("resultado").style.display = "none";
+  setTimeout(()=>{
+    document.getElementById("loading").style.display = "none";
+    linkFinal = "https://wa.me/" + num + "?text=" + encodeURIComponent(msg);
+    document.getElementById("linkTexto").innerText = linkFinal;
+    document.getElementById("resultado").style.display = "block";
+  }, 1500);
+}
+function copiar(){
+  navigator.clipboard.writeText(linkFinal);
+  alert("Link copiado bro ✅");
+}
+</script>
+
+</body>
+</html>
