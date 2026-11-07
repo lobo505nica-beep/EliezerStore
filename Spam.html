@@ -3,52 +3,94 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Generador de Link de Spam</title>
+<title>ELIEZERSTORE - Generador</title>
 <style>
-body{background:#0f0f0f;color:white;font-family:Arial;text-align:center;padding:20px}
-h1{color:#25D366}
-input,textarea{width:90%;max-width:400px;padding:12px;margin:8px;border-radius:10px;border:none;outline:none;font-size:16px}
-button{background:#25D366;color:white;border:none;padding:13px 25px;border-radius:10px;font-size:17px;font-weight:bold;cursor:pointer;margin-top:10px}
-#resultado{margin-top:20px;background:#1c1c1c;padding:15px;border-radius:12px;word-break:break-all;display:none}
-#loading{display:none;color:#25D366;font-weight:bold;margin-top:15px}
+*{box-sizing:border-box}
+body{background:#000;color:#fff;font-family:Arial;text-align:center;padding:15px;margin:0}
+.top{font-size:34px;font-weight:900;color:#25D366;text-shadow:0 0 20px #25D366,0 0 40px #25D366;margin-top:10px}
+.top span{color:#fff}
+.sub{color:#999;font-size:13px;margin-bottom:20px;letter-spacing:1px}
+.card{background:#0d0d0d;border:1px solid #25D366;border-radius:18px;padding:16px;margin:12px auto;max-width:430px;text-align:left;box-shadow:0 0 25px #25D36644}
+.card h3{margin:0 0 10px;color:#25D366;font-size:15px}
+input,textarea,select{width:100%;padding:13px;border-radius:12px;border:1px solid #333;background:#000;color:#fff;font-size:16px;outline:none}
+input:focus,textarea:focus{border-color:#25D366;box-shadow:0 0 10px #25D36666}
+.btn{width:100%;max-width:430px;background:#25D366;color:#000;border:none;padding:15px;border-radius:14px;font-size:18px;font-weight:900;cursor:pointer;margin-top:5px;box-shadow:0 0 20px #25D36688}
+.btn:active{transform:scale(0.97)}
+#loading{display:none;color:#25D366;font-weight:bold;margin-top:15px;font-size:15px}
+#resultado{display:none}
+#linkTexto{background:#000;padding:13px;border-radius:12px;word-break:break-all;border:1px dashed #25D366;font-size:14px;color:#aaffcc}
+.btn2{background:#fff;color:#000}
+.footer{color:#555;font-size:12px;margin-top:25px}
+.badge{display:inline-block;background:#25D366;color:#000;font-size:11px;font-weight:900;padding:4px 10px;border-radius:20px;margin-top:8px}
 </style>
 </head>
 <body>
 
-<h1>Generador de Link de Spam</h1>
-<p>Escribe el número y el mensaje</p>
+<div class="top">ELIEZER<span>STORE</span></div>
+<div class="sub">GENERADOR DE LINK OFICIAL • 2026</div>
+<div class="badge">✦ 100% FUNCIONAL ✦</div>
 
-<input id="numero" type="tel" placeholder="Ej: 50512345678">
-<br>
-<textarea id="mensaje" rows="3" placeholder="Escribe tu mensaje aquí..."></textarea>
-<br>
-<button onclick="generar()">GENERAR LINK</button>
-
-<div id="loading">Generando link... ⏳</div>
-
-<div id="resultado">
-<p id="linkTexto"></p>
-<button onclick="copiar()">COPIAR LINK</button>
+<div class="card">
+<h3>1. 📱 NÚMERO DE WHATSAPP</h3>
+<input id="numero" type="tel" placeholder="Ej: 505 85519519">
 </div>
 
+<div class="card">
+<h3>2. 💬 MENSAJE</h3>
+<textarea id="mensaje" rows="3" placeholder="Ej: Hola EliezerStore me interesa un producto"></textarea>
+</div>
+
+<div class="card">
+<h3>3. 🎨 ESTILO DEL LINK</h3>
+<select id="estilo">
+<option value="normal">Normal - EliezerStore</option>
+<option value="soporte">Soporte EliezerStore</option>
+<option value="pedido">Pedido / Compra</option>
+</select>
+</div>
+
+<button class="btn" onclick="generar()">GENERAR LINK ⚡</button>
+
+<div id="loading">⏳ Creando tu link de EliezerStore...</div>
+
+<div class="card" id="resultado">
+<h3>4. ✅ LINK LISTO - CHINGÓN</h3>
+<p id="linkTexto"></p>
+<button class="btn btn2" onclick="copiar()">COPIAR LINK 📋</button>
+<button class="btn" onclick="abrir()">ABRIR EN WHATSAPP 🚀</button>
+</div>
+
+<div class="footer">© EliezerStore - Hecho con estilo 🔥</div>
+
 <script>
-let linkFinal = "";
+let linkFinal="";
 function generar(){
-  let num = document.getElementById("numero").value.trim();
-  let msg = document.getElementById("mensaje").value.trim();
-  if(!num){ alert("Pon el número bro"); return; }
-  document.getElementById("loading").style.display = "block";
-  document.getElementById("resultado").style.display = "none";
-  setTimeout(()=>{
-    document.getElementById("loading").style.display = "none";
-    linkFinal = "https://wa.me/" + num + "?text=" + encodeURIComponent(msg);
-    document.getElementById("linkTexto").innerText = linkFinal;
-    document.getElementById("resultado").style.display = "block";
-  }, 1500);
+ let num=document.getElementById("numero").value.trim().replace(/[^0-9]/g,"");
+ let msg=document.getElementById("mensaje").value.trim();
+ let estilo=document.getElementById("estilo").value;
+ if(!num){alert("Bro, pon el número");return;}
+ if(!msg){
+   if(estilo==="soporte") msg="Hola EliezerStore necesito soporte";
+   else if(estilo==="pedido") msg="Hola EliezerStore quiero hacer un pedido";
+   else msg="Hola EliezerStore";
+ }
+ document.getElementById("loading").style.display="block";
+ document.getElementById("resultado").style.display="none";
+ setTimeout(()=>{
+  document.getElementById("loading").style.display="none";
+  // AQUÍ ESTÁ LO CHINGÓN: EL ESPACIO SALE COMO +
+  let msgConMas = encodeURIComponent(msg).replace(/%20/g, "+");
+  linkFinal="https://wa.me/"++++++++++++++++++++num+"?text="+msgConMas;
+  document.getElementById("linkTexto").innerText=linkFinal;
+  document.getElementById("resultado").style.display="block";
+ },1500);
 }
 function copiar(){
-  navigator.clipboard.writeText(linkFinal);
-  alert("Link copiado bro ✅");
+ navigator.clipboard.writeText(linkFinal);
+ alert("Link copiado ✅ - EliezerStore");
+}
+function abrir(){
+ window.open(linkFinal,"_blank");
 }
 </script>
 
