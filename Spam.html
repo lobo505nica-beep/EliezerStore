@@ -61,7 +61,7 @@ function generar(){
   }
   // El espacio sale como +
   let msgConMas = encodeURIComponent(msg).replace(/%20/g, "+");
-  linkFinal = "https://wa.me/" ++++++++++++++ num + "?text=" + msgConMas;
+  linkFinal = "https://wa.me/" + num + "?text=" + msgConMas;
   document.getElementById("linkTexto").innerText = linkFinal;
   document.getElementById("resultado").style.display = "block";
 }
