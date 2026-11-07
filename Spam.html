@@ -7,28 +7,24 @@
 <style>
 *{box-sizing:border-box}
 body{background:#000;color:#fff;font-family:Arial;text-align:center;padding:15px;margin:0}
-.top{font-size:34px;font-weight:900;color:#25D366;text-shadow:0 0 20px #25D366,0 0 40px #25D366;margin-top:10px}
+.top{font-size:34px;font-weight:900;color:#25D366;text-shadow:0 0 20px #25D366;margin-top:10px}
 .top span{color:#fff}
-.sub{color:#999;font-size:13px;margin-bottom:20px;letter-spacing:1px}
+.sub{color:#999;font-size:13px;margin-bottom:20px}
 .card{background:#0d0d0d;border:1px solid #25D366;border-radius:18px;padding:16px;margin:12px auto;max-width:430px;text-align:left;box-shadow:0 0 25px #25D36644}
 .card h3{margin:0 0 10px;color:#25D366;font-size:15px}
-input,textarea,select{width:100%;padding:13px;border-radius:12px;border:1px solid #333;background:#000;color:#fff;font-size:16px;outline:none}
-input:focus,textarea:focus{border-color:#25D366;box-shadow:0 0 10px #25D36666}
-.btn{width:100%;max-width:430px;background:#25D366;color:#000;border:none;padding:15px;border-radius:14px;font-size:18px;font-weight:900;cursor:pointer;margin-top:5px;box-shadow:0 0 20px #25D36688}
-.btn:active{transform:scale(0.97)}
-#loading{display:none;color:#25D366;font-weight:bold;margin-top:15px;font-size:15px}
+input,textarea{width:100%;padding:13px;border-radius:12px;border:1px solid #333;background:#000;color:#fff;font-size:16px;outline:none}
+input:focus,textarea:focus{border-color:#25D366}
+.btn{width:100%;max-width:430px;background:#25D366;color:#000;border:none;padding:15px;border-radius:14px;font-size:18px;font-weight:900;cursor:pointer;margin-top:5px}
+.btn2{background:#fff;color:#000}
 #resultado{display:none}
 #linkTexto{background:#000;padding:13px;border-radius:12px;word-break:break-all;border:1px dashed #25D366;font-size:14px;color:#aaffcc}
-.btn2{background:#fff;color:#000}
 .footer{color:#555;font-size:12px;margin-top:25px}
-.badge{display:inline-block;background:#25D366;color:#000;font-size:11px;font-weight:900;padding:4px 10px;border-radius:20px;margin-top:8px}
 </style>
 </head>
 <body>
 
 <div class="top">ELIEZER<span>STORE</span></div>
 <div class="sub">GENERADOR DE LINK OFICIAL • 2026</div>
-<div class="badge">✦ 100% FUNCIONAL ✦</div>
 
 <div class="card">
 <h3>1. 📱 NÚMERO DE WHATSAPP</h3>
@@ -40,57 +36,41 @@ input:focus,textarea:focus{border-color:#25D366;box-shadow:0 0 10px #25D36666}
 <textarea id="mensaje" rows="3" placeholder="Ej: Hola EliezerStore me interesa un producto"></textarea>
 </div>
 
-<div class="card">
-<h3>3. 🎨 ESTILO DEL LINK</h3>
-<select id="estilo">
-<option value="normal">Normal - EliezerStore</option>
-<option value="soporte">Soporte EliezerStore</option>
-<option value="pedido">Pedido / Compra</option>
-</select>
-</div>
-
 <button class="btn" onclick="generar()">GENERAR LINK ⚡</button>
 
-<div id="loading">⏳ Creando tu link de EliezerStore...</div>
-
 <div class="card" id="resultado">
-<h3>4. ✅ LINK LISTO - CHINGÓN</h3>
+<h3>3. ✅ LINK LISTO</h3>
 <p id="linkTexto"></p>
 <button class="btn btn2" onclick="copiar()">COPIAR LINK 📋</button>
 <button class="btn" onclick="abrir()">ABRIR EN WHATSAPP 🚀</button>
 </div>
 
-<div class="footer">© EliezerStore - Hecho con estilo 🔥</div>
+<div class="footer">© EliezerStore 🔥</div>
 
 <script>
 let linkFinal="";
 function generar(){
- let num=document.getElementById("numero").value.trim().replace(/[^0-9]/g,"");
- let msg=document.getElementById("mensaje").value.trim();
- let estilo=document.getElementById("estilo").value;
- if(!num){alert("Bro, pon el número");return;}
- if(!msg){
-   if(estilo==="soporte") msg="Hola EliezerStore necesito soporte";
-   else if(estilo==="pedido") msg="Hola EliezerStore quiero hacer un pedido";
-   else msg="Hola EliezerStore";
- }
- document.getElementById("loading").style.display="block";
- document.getElementById("resultado").style.display="none";
- setTimeout(()=>{
-  document.getElementById("loading").style.display="none";
-  // AQUÍ ESTÁ LO CHINGÓN: EL ESPACIO SALE COMO +
+  let num = document.getElementById("numero").value.replace(/[^0-9]/g,"");
+  let msg = document.getElementById("mensaje").value.trim();
+  if(!num){
+    alert("Bro, pon el número primero");
+    return;
+  }
+  if(!msg){
+    msg = "Hola EliezerStore";
+  }
+  // El espacio sale como +
   let msgConMas = encodeURIComponent(msg).replace(/%20/g, "+");
-  linkFinal="https://wa.me/"++++++++++++++++++++num+"?text="+msgConMas;
-  document.getElementById("linkTexto").innerText=linkFinal;
-  document.getElementById("resultado").style.display="block";
- },1500);
+  linkFinal = "https://wa.me/" + num + "?text=" + msgConMas;
+  document.getElementById("linkTexto").innerText = linkFinal;
+  document.getElementById("resultado").style.display = "block";
 }
 function copiar(){
- navigator.clipboard.writeText(linkFinal);
- alert("Link copiado ✅ - EliezerStore");
+  navigator.clipboard.writeText(linkFinal);
+  alert("Copiado ✅");
 }
 function abrir(){
- window.open(linkFinal,"_blank");
+  window.open(linkFinal, "_blank");
 }
 </script>
 
